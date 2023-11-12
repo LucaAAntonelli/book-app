@@ -31,6 +31,7 @@ async fn main() -> Result<(), sqlx::Error> {
     db::insert_book(&books[index], &pool).await?;
     db::all_authors(&pool).await?;
     db::all_books(&pool).await?;
+    db::all_references(&pool).await?;
 
     Ok(())
 }

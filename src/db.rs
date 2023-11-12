@@ -30,6 +30,8 @@ pub async fn insert_book(book: &Book, pool: &Pool<sqlx::Postgres>) -> Result<(),
         )
         .execute(pool)
         .await?;
+
+        sqlx::query!("INSERT INTO BookAuthors (book_id, author_id) VALUES ((SELECT book_id FROM Books WHERE title = $1), (SELECT author_id FROM Authors WHERE name = $2)) ON CONFLICT DO NOTHING", book.title, author).execute(pool).await?;
     }
 
     Ok(())
@@ -52,5 +54,15 @@ pub async fn all_authors(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error>
         println!("{:?}", row);
     }
 
+    Ok(())
+}
+
+pub async fn all_references(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
+    let query_result = sqlx::query!("SELECT * FROM BookAuthors")
+        .fetch_all(pool)
+        .await?;
+    for row in query_result {
+        println!("{:?}", row);
+    }
     Ok(())
 }
