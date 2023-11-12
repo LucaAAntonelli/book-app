@@ -5,9 +5,9 @@ use serde_json::{self, json};
 #[derive(Deserialize)]
 
 pub struct Book {
-    title: String,
-    authors: Vec<String>,
-    pages: u64,
+    pub title: String,
+    pub authors: Vec<String>,
+    pub pages: u64,
 }
 
 impl std::fmt::Display for Book {
