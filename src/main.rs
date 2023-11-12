@@ -2,8 +2,6 @@ use std::io;
 mod db;
 mod requests;
 
-use crate::requests::Book;
-
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error> {
     let mut query = String::new();
