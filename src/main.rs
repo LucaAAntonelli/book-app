@@ -1,12 +1,9 @@
-use sqlx::postgres::PgPoolOptions;
 use std::io;
-
+mod db;
 mod requests;
-
 
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error> {
-    
     let mut query = String::new();
     println!("Enter book to search");
     io::stdin()
@@ -21,8 +18,7 @@ async fn main() -> Result<(), sqlx::Error> {
         println!("{book}");
     }
 
-    let database_url = "postgres://postgres:mysecretpassword@localhost/postgres";
-    let pool = PgPoolOptions::new().max_connections(5).connect(&database_url).await?;
+    let pool = db::connect().await?;
 
     let query_result = sqlx::query!("SELECT * FROM Books").fetch_all(&pool).await?;
 
@@ -33,5 +29,4 @@ async fn main() -> Result<(), sqlx::Error> {
     }
 
     Ok(())
-   
 }

@@ -1,9 +1,0 @@
-{
-    "rust-analyzer.linkedProjects": [
-        "./book-api/Cargo.toml",
-        "./book-api/Cargo.toml",
-        "./book-api/Cargo.toml",
-        "./book-api/Cargo.toml",
-        "./book-api/Cargo.toml"
-    ]
-}
