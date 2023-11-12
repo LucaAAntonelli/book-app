@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS Books, Authors, BookAuthors;
+
 CREATE TABLE Books (
     book_id SERIAL PRIMARY KEY,
     title VARCHAR(63) NOT NULL,
@@ -11,11 +13,11 @@ CREATE TABLE Books (
 
 CREATE TABLE Authors (
     author_id SERIAL PRIMARY KEY,
-    name VARCHAR(63)
+    name VARCHAR(63) UNIQUE NOT NULL
 );
 
 CREATE TABLE BookAuthors (
-    book_id INTEGER REFERENCES Books(book_id),
-    author_id INTEGER REFERENCES Authors(author_id),
+    book_id INTEGER REFERENCES Books(book_id) ON DELETE CASCADE,
+    author_id INTEGER REFERENCES Authors(author_id) ON DELETE CASCADE,
     PRIMARY KEY (book_id, author_id)
 );

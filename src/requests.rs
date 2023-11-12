@@ -2,8 +2,8 @@ extern crate reqwest;
 use serde::Deserialize;
 use serde_json::Value;
 use serde_json::{self, json};
-#[derive(Deserialize)]
 
+#[derive(Deserialize)]
 pub struct Book {
     pub title: String,
     pub authors: Vec<String>,
@@ -14,7 +14,7 @@ impl std::fmt::Display for Book {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
-            "Title: {}, Author: {}, Pages: {}",
+            "Title: {}, Author(s): {}, Pages: {}",
             self.title,
             self.authors.join(", "),
             self.pages
@@ -42,7 +42,11 @@ fn json_to_book(json: &Value) -> Book {
         .as_array()
         .unwrap_or(&vec![json!("None")])
         .iter()
-        .map(|v| v.to_string().to_owned())
+        .map(|v| {
+            v.as_str()
+                .expect("Could not convert author name to string")
+                .to_owned()
+        })
         .collect();
 
     let pages = json["volumeInfo"]["pageCount"].as_u64().unwrap_or_default();

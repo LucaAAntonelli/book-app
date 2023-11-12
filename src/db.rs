@@ -13,8 +13,7 @@ pub async fn connect() -> Result<Pool<sqlx::Postgres>, sqlx::Error> {
     Ok(pool)
 }
 
-pub async fn insert_book(book: Book, pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
-    println!("insert_book");
+pub async fn insert_book(book: &Book, pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
     sqlx::query!(
         "INSERT INTO Books (title, num_pages, acquisition_date) VALUES ($1, $2, $3)",
         book.title,
@@ -24,12 +23,31 @@ pub async fn insert_book(book: Book, pool: &Pool<sqlx::Postgres>) -> Result<(), 
     .execute(pool)
     .await?;
 
+    for author in &book.authors {
+        sqlx::query!(
+            "INSERT INTO Authors (name) VALUES ($1) ON CONFLICT (name) DO NOTHING",
+            author.to_owned()
+        )
+        .execute(pool)
+        .await?;
+    }
+
     Ok(())
 }
 
 pub async fn all_books(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
-    println!("all_books");
     let query_result = sqlx::query!("SELECT * FROM Books").fetch_all(pool).await?;
+    for row in query_result {
+        println!("{:?}", row);
+    }
+
+    Ok(())
+}
+
+pub async fn all_authors(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
+    let query_result = sqlx::query!("SELECT * FROM Authors")
+        .fetch_all(pool)
+        .await?;
     for row in query_result {
         println!("{:?}", row);
     }
