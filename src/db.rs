@@ -66,3 +66,35 @@ pub async fn all_references(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Err
     }
     Ok(())
 }
+
+pub async fn alter_start_date(
+    pool: &Pool<sqlx::Postgres>,
+    book_id: i32,
+    start_date: NaiveDate,
+) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+        "UPDATE Books SET start_date = $1 WHERE book_id = $2",
+        start_date,
+        book_id
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+pub async fn alter_end_date(
+    pool: &Pool<sqlx::Postgres>,
+    book_id: i32,
+    end_date: NaiveDate,
+) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+        "UPDATE Books SET end_date = $1 WHERE book_id = $2",
+        end_date,
+        book_id
+    )
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
