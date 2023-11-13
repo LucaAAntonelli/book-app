@@ -8,7 +8,9 @@ CREATE TABLE Books (
     start_date DATE,
     end_date DATE,
     price_ebook DECIMAL(5,2),
-    price_paperback DECIMAL(5,2)
+    price_paperback DECIMAL(5,2),
+    CONSTRAINT no_negative_prices CHECK (price_ebook >= 0 AND price_paperback >= 0),
+    CONSTRAINT check_order CHECK (acquisition_date <= start_date AND start_date <= end_date)
 );
 
 CREATE TABLE Authors (
