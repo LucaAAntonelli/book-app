@@ -50,7 +50,6 @@ impl eframe::App for TemplateApp {
             // The top panel is often a good place for a menu bar:
 
             egui::menu::bar(ui, |ui| {
-                #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
                 {
                     ui.menu_button("File", |ui| {
                         if ui.button("Quit").clicked() {
@@ -69,14 +68,12 @@ impl eframe::App for TemplateApp {
             ui.heading("eframe template");
 
             ui.horizontal(|ui| {
-                ui.label("Write something: ");
+                ui.label("Enter Book:");
                 ui.text_edit_singleline(&mut self.label);
+                if ui.button("Search").clicked() {
+                    println!("Searching...");
+                }
             });
-
-            ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
-            if ui.button("Increment").clicked() {
-                self.value += 1.0;
-            }
         });
     }
 }
