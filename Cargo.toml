@@ -29,6 +29,8 @@ log = "0.4"
 
 # native:
 env_logger = "0.10"
+ehttp = "0.3.1"
+poll-promise = "0.3.0"
 
 [profile.release]
 opt-level = 2 # fast and small wasm

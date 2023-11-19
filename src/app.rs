@@ -3,8 +3,7 @@
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
     // Example stuff:
-    label: String,
-
+    query_str: String,
     #[serde(skip)] // This how you opt-out of serialization of a field
     value: f32,
 }
@@ -13,7 +12,7 @@ impl Default for TemplateApp {
     fn default() -> Self {
         Self {
             // Example stuff:
-            label: "Goodbye World!".to_owned(),
+            query_str: "".to_owned(),
             value: 2.3,
         }
     }
@@ -69,9 +68,9 @@ impl eframe::App for TemplateApp {
 
             ui.horizontal(|ui| {
                 ui.label("Enter Book:");
-                ui.text_edit_singleline(&mut self.label);
+                ui.text_edit_singleline(&mut self.query_str);
                 if ui.button("Search").clicked() {
-                    println!("Searching...");
+                    println!("Searching for {}...", self.query_str);
                 }
             });
         });
