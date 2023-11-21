@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-
+use egui_extras::{Column, TableBuilder};
 #[derive(serde::Deserialize, serde::Serialize)]
 struct BookFromTable {
     title: String,
@@ -140,6 +140,53 @@ impl eframe::App for TemplateApp {
                 if ui.button("Search").clicked() {
                     println!("Searching for {}...", self.query_str);
                 }
+            });
+
+            ui.heading("Test Table");
+
+            ui.vertical(|ui| {
+                let text_height = egui::TextStyle::Body.resolve(ui.style()).size;
+                let table = TableBuilder::new(ui)
+                    .striped(true)
+                    .resizable(true)
+                    .cell_layout(egui::Layout::left_to_right(egui::Align::Center))
+                    .column(Column::auto())
+                    .column(Column::initial(100.0).range(40.0..=300.0))
+                    .column(Column::initial(100.0).at_least(40.0).clip(true))
+                    .column(Column::remainder())
+                    .min_scrolled_height(0.0);
+
+                table
+                    .header(20.0, |mut header| {
+                        header.col(|ui| {
+                            ui.strong("Column 1");
+                        });
+                        header.col(|ui| {
+                            ui.strong("Column 2");
+                        });
+                        header.col(|ui| {
+                            ui.strong("Column 3");
+                        });
+                    })
+                    .body(|body| {
+                        body.rows(text_height, 100, |row_index, mut row| {
+                            row.col(|ui| {
+                                ui.label(row_index.to_string());
+                            });
+                            row.col(|ui| {
+                                ui.label("Column 1");
+                            });
+                            row.col(|ui| {
+                                ui.label("Column 2");
+                            });
+                            row.col(|ui| {
+                                ui.add(
+                                    egui::Label::new("Thousands of rows of even height")
+                                        .wrap(false),
+                                );
+                            });
+                        })
+                    });
             });
         });
     }
