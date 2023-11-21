@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use egui_extras::{Column, TableBuilder};
+use egui_extras::{Column, DatePickerButton, TableBuilder};
 #[derive(serde::Deserialize, serde::Serialize)]
 struct BookFromTable {
     title: String,
@@ -153,7 +153,7 @@ impl eframe::App for TemplateApp {
                     .column(Column::auto())
                     .column(Column::initial(100.0).range(40.0..=300.0))
                     .column(Column::initial(100.0).at_least(40.0).clip(true))
-                    .column(Column::remainder())
+                    .column(Column::initial(100.0))
                     .min_scrolled_height(0.0);
 
                 table
@@ -169,7 +169,7 @@ impl eframe::App for TemplateApp {
                         });
                     })
                     .body(|body| {
-                        body.rows(text_height, 100, |row_index, mut row| {
+                        body.rows(text_height, 5, |row_index, mut row| {
                             row.col(|ui| {
                                 ui.label(row_index.to_string());
                             });
@@ -177,6 +177,10 @@ impl eframe::App for TemplateApp {
                                 ui.label("Column 1");
                             });
                             row.col(|ui| {
+                                if row_index % 2 == 0 {
+                                    let mut date = NaiveDate::from_ymd_opt(1070, 1, 1).unwrap();
+                                    ui.add(DatePickerButton::new(&mut date));
+                                }
                                 ui.label("Column 2");
                             });
                             row.col(|ui| {
