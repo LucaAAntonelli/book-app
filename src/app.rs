@@ -1,4 +1,70 @@
-/// We derive Deserialize/Serialize so we can persist app state on shutdown.
+use chrono::NaiveDate;
+
+#[derive(serde::Deserialize, serde::Serialize)]
+struct BookFromTable {
+    title: String,
+    authors: Vec<String>,
+    num_pages: u64,
+    #[serde(with = "naive_date_format")]
+    acquisition_date: NaiveDate,
+    #[serde(with = "optional_naive_date_format")]
+    start_date: Option<NaiveDate>,
+    #[serde(with = "optional_naive_date_format")]
+    end_date: Option<NaiveDate>,
+}
+
+mod naive_date_format {
+    use chrono::NaiveDate;
+    use serde::{self, Deserialize};
+
+    pub fn serialize<S>(date: &NaiveDate, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let s = date.format("%Y-%m-%d").to_string();
+        serializer.serialize_str(&s)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<NaiveDate, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(serde::de::Error::custom)
+    }
+}
+
+mod optional_naive_date_format {
+    use chrono::NaiveDate;
+    use serde::{self, Deserialize};
+
+    pub fn serialize<S>(date: &Option<NaiveDate>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match date {
+            Some(d) => {
+                let s = d.format("%Y-%m-%d").to_string();
+                serializer.serialize_str(&s)
+            }
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<NaiveDate>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s: Option<String> = Option::deserialize(deserializer)?;
+        match s {
+            Some(date_str) => NaiveDate::parse_from_str(&date_str, "%Y-%m-%d")
+                .map(Some)
+                .map_err(serde::de::Error::custom),
+            None => Ok(None),
+        }
+    }
+}
+
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct TemplateApp {
@@ -6,6 +72,7 @@ pub struct TemplateApp {
     query_str: String,
     #[serde(skip)] // This how you opt-out of serialization of a field
     value: f32,
+    table: Option<Vec<BookFromTable>>,
 }
 
 impl Default for TemplateApp {
@@ -14,6 +81,7 @@ impl Default for TemplateApp {
             // Example stuff:
             query_str: "".to_owned(),
             value: 2.3,
+            table: Option::None,
         }
     }
 }
