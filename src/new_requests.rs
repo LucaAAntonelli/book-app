@@ -59,6 +59,12 @@ impl Default for HttpApp {
     }
 }
 
+impl HttpApp {
+    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        Default::default()
+    }
+}
+
 impl eframe::App for HttpApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         egui::TopBottomPanel::bottom("http_bottom").show(ctx, |ui| {
@@ -174,7 +180,7 @@ fn ui_resource(ui: &mut egui::Ui, resource: &Resource) {
     ui.separator();
 
     egui::ScrollArea::vertical()
-        .auto_shrink(false)
+        .auto_shrink([false; 2])
         .show(ui, |ui| {
             egui::CollapsingHeader::new("Response headers")
                 .default_open(false)

@@ -1,4 +1,4 @@
-extern crate reqwest;
+use reqwest;
 use serde::Deserialize;
 use serde_json::Value;
 use serde_json::{self, json};
@@ -11,7 +11,7 @@ pub struct Book {
 }
 
 impl std::fmt::Display for Book {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "Title: {}, Author(s): {}, Pages: {}",

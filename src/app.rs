@@ -29,7 +29,6 @@ impl TemplateApp {
         if let Some(storage) = cc.storage {
             return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
         }
-
         Default::default()
     }
 }
@@ -73,6 +72,27 @@ impl eframe::App for TemplateApp {
                     println!("Searching for {}...", self.query_str);
                 }
             });
+
+            ui.horizontal(|ui| {
+                ui.label("Test Table");
+                ui.
+            })
         });
     }
 }
+
+enum DemoType {
+    Manual,
+    ManyHomogeneous,
+    ManyHeterogenous
+}
+
+pub struct TableDemo {
+    demo: DemoType,
+    striped: bool,
+    resizable: bool,
+    num_rows: usize,
+    scroll_to_row_slider: usize,
+    scroll_to_row: Option<usize>
+}
+
