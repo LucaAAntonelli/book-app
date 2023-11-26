@@ -1,19 +1,105 @@
-/// We derive Deserialize/Serialize so we can persist app state on shutdown.
+// use crate::db::all_books;
+use chrono::NaiveDate;
+use egui_extras::{Column, DatePickerButton, TableBuilder};
+use sqlx::postgres::PgPoolOptions;
+use sqlx::Pool;
 #[derive(serde::Deserialize, serde::Serialize)]
-#[serde(default)] // if we add new fields, give them default values when deserializing old state
+pub struct BookFromTable {
+    title: String,
+    authors: Vec<String>,
+    num_pages: u64,
+    #[serde(with = "naive_date_format")]
+    acquisition_date: NaiveDate,
+    #[serde(with = "optional_naive_date_format")]
+    start_date: Option<NaiveDate>,
+    #[serde(with = "optional_naive_date_format")]
+    end_date: Option<NaiveDate>,
+    price_ebook: f32,
+    price_paperback: f32,
+}
+
+mod naive_date_format {
+    use chrono::NaiveDate;
+    use serde::{self, Deserialize};
+
+    pub fn serialize<S>(date: &NaiveDate, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let s = date.format("%Y-%m-%d").to_string();
+        serializer.serialize_str(&s)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<NaiveDate, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(serde::de::Error::custom)
+    }
+}
+
+mod optional_naive_date_format {
+    use chrono::NaiveDate;
+    use serde::{self, Deserialize};
+
+    pub fn serialize<S>(date: &Option<NaiveDate>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match date {
+            Some(d) => {
+                let s = d.format("%Y-%m-%d").to_string();
+                serializer.serialize_str(&s)
+            }
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<NaiveDate>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s: Option<String> = Option::deserialize(deserializer)?;
+        match s {
+            Some(date_str) => NaiveDate::parse_from_str(&date_str, "%Y-%m-%d")
+                .map(Some)
+                .map_err(serde::de::Error::custom),
+            None => Ok(None),
+        }
+    }
+}
+
 pub struct TemplateApp {
     // Example stuff:
     query_str: String,
-    #[serde(skip)] // This how you opt-out of serialization of a field
     value: f32,
+    db_connection: Pool<sqlx::Postgres>,
+    table: Option<Vec<BookFromTable>>,
 }
 
 impl Default for TemplateApp {
     fn default() -> Self {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        let database_url = "postgres://postgres:mysecretpassword@localhost/postgres";
+        let pool = rt
+            .block_on(async {
+                PgPoolOptions::new()
+                    .max_connections(5)
+                    .connect(database_url)
+                    .await
+            })
+            .unwrap();
+
         Self {
             // Example stuff:
             query_str: "".to_owned(),
             value: 2.3,
+            db_connection: pool,
+            table: Option::None,
         }
     }
 }
@@ -26,19 +112,12 @@ impl TemplateApp {
 
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
-        if let Some(storage) = cc.storage {
-            return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
-        }
+
         Default::default()
     }
 }
 
 impl eframe::App for TemplateApp {
-    /// Called by the frame work to save state before shutdown.
-    fn save(&mut self, storage: &mut dyn eframe::Storage) {
-        eframe::set_value(storage, eframe::APP_KEY, self);
-    }
-
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
@@ -73,10 +152,75 @@ impl eframe::App for TemplateApp {
                 }
             });
 
-            ui.horizontal(|ui| {
-                ui.label("Test Table");
-                ui.
-            })
+            ui.heading("List of Read Books");
+
+            ui.vertical(|ui| {
+                let text_height = egui::TextStyle::Body.resolve(ui.style()).size;
+                let table = TableBuilder::new(ui)
+                    .striped(true)
+                    .resizable(true)
+                    .cell_layout(egui::Layout::left_to_right(egui::Align::Center))
+                    .column(Column::auto())
+                    .column(Column::initial(100.0).range(40.0..=300.0))
+                    .column(Column::initial(100.0).at_least(40.0).clip(true))
+                    .column(Column::initial(100.0))
+                    .column(Column::initial(100.0))
+                    .column(Column::initial(100.0))
+                    .column(Column::initial(100.0))
+                    .column(Column::initial(100.0))
+                    .min_scrolled_height(0.0);
+
+                table
+                    .header(20.0, |mut header| {
+                        header.col(|ui| {
+                            ui.strong("Title");
+                        });
+                        header.col(|ui| {
+                            ui.strong("Authors");
+                        });
+                        header.col(|ui| {
+                            ui.strong("Number of Pages");
+                        });
+                        header.col(|ui| {
+                            ui.strong("Acquisition Date");
+                        });
+                        header.col(|ui| {
+                            ui.strong("Start Date");
+                        });
+                        header.col(|ui| {
+                            ui.strong("End Date");
+                        });
+                        header.col(|ui| {
+                            ui.strong("Price eBook");
+                        });
+                        header.col(|ui| {
+                            ui.strong("Price Paperback");
+                        });
+                    })
+                    .body(|body| {
+                        body.rows(text_height, 10, |row_index, mut row| {
+                            row.col(|ui| {
+                                ui.label(row_index.to_string());
+                            });
+                            row.col(|ui| {
+                                ui.label("Column 1");
+                            });
+                            // row.col(|ui| {
+                            //     if row_index % 2 == 0 {
+                            //         let mut date = NaiveDate::from_ymd_opt(1070, 1, 1).unwrap();
+                            //         ui.add(DatePickerButton::new(&mut date));
+                            //     }
+                            //     ui.label("Column 2");
+                            // });
+                            row.col(|ui| {
+                                ui.add(
+                                    egui::Label::new("Thousands of rows of even height")
+                                        .wrap(false),
+                                );
+                            });
+                        })
+                    });
+            });
         });
     }
 }
@@ -84,7 +228,7 @@ impl eframe::App for TemplateApp {
 enum DemoType {
     Manual,
     ManyHomogeneous,
-    ManyHeterogenous
+    ManyHeterogenous,
 }
 
 pub struct TableDemo {
@@ -93,6 +237,5 @@ pub struct TableDemo {
     resizable: bool,
     num_rows: usize,
     scroll_to_row_slider: usize,
-    scroll_to_row: Option<usize>
+    scroll_to_row: Option<usize>,
 }
-
