@@ -1,8 +1,8 @@
+use crate::app::BookFromTable;
+use crate::requests::Book;
 use chrono::NaiveDate;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Pool;
-
-use crate::requests::Book;
 
 pub async fn connect() -> Result<Pool<sqlx::Postgres>, sqlx::Error> {
     let database_url = "postgres://postgres:mysecretpassword@localhost/postgres";
@@ -37,14 +37,11 @@ pub async fn insert_book(book: &Book, pool: &Pool<sqlx::Postgres>) -> Result<(),
     Ok(())
 }
 
-pub async fn all_books(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
-    let query_result = sqlx::query!("SELECT * FROM Books").fetch_all(pool).await?;
-    for row in query_result {
-        println!("{:?}", row);
-    }
-
-    Ok(())
-}
+// pub async fn all_books(pool: &Pool<sqlx::Postgres>) -> Result<BookFromTable, sqlx::Error> {
+//     let query_result = sqlx::query!("SELECT * FROM Books").fetch_all(pool).await?;
+//     let result: BookFromTable = query_result;
+//     Ok(result)
+// }
 
 pub async fn all_authors(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
     let query_result = sqlx::query!("SELECT * FROM Authors")
