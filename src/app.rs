@@ -84,7 +84,7 @@ impl Default for TemplateApp {
             .enable_all()
             .build()
             .unwrap();
-        let database_url = "postgres://postgres:mysecretpassword@localhost/postgres";
+        let database_url = "postgres://postgres:password@localhost/postgres";
         let pool = rt
             .block_on(async {
                 PgPoolOptions::new()
