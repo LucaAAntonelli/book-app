@@ -1,17 +1,17 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM Books",
+  "query": "SELECT \n    b.title AS title,\n    string_agg(a.name, ', ') AS authors,\n    b.num_pages AS num_pages,\n    b.acquisition_date AS acquisition_date,\n    b.start_date AS start_date,\n    b.end_date AS end_date,\n    b.price_ebook AS price_ebook\nFROM \n    Books b\nJOIN \n    BookAuthors ba ON b.book_id = ba.book_id\nJOIN \n    Authors a ON ba.author_id = a.author_id\nGROUP BY \n    b.book_id;",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "book_id",
-        "type_info": "Int4"
+        "name": "title",
+        "type_info": "Varchar"
       },
       {
         "ordinal": 1,
-        "name": "title",
-        "type_info": "Varchar"
+        "name": "authors",
+        "type_info": "Text"
       },
       {
         "ordinal": 2,
@@ -37,11 +37,6 @@
         "ordinal": 6,
         "name": "price_ebook",
         "type_info": "Numeric"
-      },
-      {
-        "ordinal": 7,
-        "name": "price_paperback",
-        "type_info": "Numeric"
       }
     ],
     "parameters": {
@@ -49,14 +44,13 @@
     },
     "nullable": [
       false,
+      null,
       false,
       false,
-      false,
-      true,
       true,
       true,
       true
     ]
   },
-  "hash": "24d451e7d0e9e7f34aa86d3c17ff571f18b0b27ff7f86e94e29475e78a252b0f"
+  "hash": "da9bd29fb3447566231f3ebbfe1296cf3212352fedb209cbad019cff3e787a6e"
 }
