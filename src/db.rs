@@ -2,10 +2,10 @@ use crate::app::BookFromTable;
 use crate::requests::Book;
 use chrono::NaiveDate;
 use sqlx::postgres::PgPoolOptions;
-use sqlx::Pool;
+use sqlx::{Pool, Postgres, query};
 
 pub async fn connect() -> Result<Pool<sqlx::Postgres>, sqlx::Error> {
-    let database_url = "postgres://postgres:mysecretpassword@localhost/postgres";
+    let database_url = "postgres://postgres:mysecretpassword@mypostgres.crzu5du3w8kg.eu-north-1.rds.amazonaws.com:5432/bookdb";
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&database_url)
@@ -95,3 +95,27 @@ pub async fn alter_end_date(
 
     Ok(())
 }
+
+// pub async fn all_read_books(pool: &Pool<sqlx::Postgres>) -> Result<Vec<BookFromTable>, sqlx::Error> {
+//     let result = sqlx::query_as!(BookFromTable, "
+//     SELECT 
+//         b.title AS title, 
+//         string_agg(a.name, ', ') AS authors,
+//         b.num_pages AS num_pages,
+//         b.acquisition_date AS acquisition_date,
+//         b.start_date AS start_date,
+//         b.end_date AS end_date,
+//         b.price_ebook AS price_ebook,
+//         b.price_paperback AS price_paperback
+//     FROM 
+//         Books b
+//     JOIN 
+//         BookAuthors ba ON b.book_id = ba.book_id
+//     JOIN 
+//         Authors a ON ba.author_id = a.author_id
+//     GROUP BY 
+//         b.book_id;").fetch_all(pool).await?;
+
+   
+//     Ok(result)
+// } 

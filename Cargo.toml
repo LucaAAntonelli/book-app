@@ -27,6 +27,7 @@ env_logger = "0.10"
 ehttp = "0.3.1"
 poll-promise = "0.3.0"
 egui_demo_lib = "0.23.0"
+glutin = "0.31.2"
 [profile.release]
 opt-level = 2 # fast and small wasm
 

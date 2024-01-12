@@ -3,6 +3,9 @@ use chrono::NaiveDate;
 use egui_extras::{Column, DatePickerButton, TableBuilder};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Pool;
+
+use crate::requests::Book;
+
 pub struct BookFromTable {
     title: String,
     authors: Vec<String>,
@@ -10,8 +13,26 @@ pub struct BookFromTable {
     acquisition_date: NaiveDate,
     start_date: Option<NaiveDate>,
     end_date: Option<NaiveDate>,
-    price_ebook: f32,
-    price_paperback: f32,
+    price_ebook: Option<f32>,
+    price_paperback: Option<f32>,
+}
+
+impl BookFromTable {
+    pub fn new(title: String,
+        authors: String,
+        num_pages: u64,
+        acquisition_date: NaiveDate,
+        start_date: Option<NaiveDate>,
+        end_date: Option<NaiveDate>,
+        price_ebook: Option<f32>,
+        price_paperback: Option<f32>) -> Self {
+            let author_vec: Vec<String> = if authors.is_empty() {
+                Vec::new()
+            } else {
+                authors.split(",").map(|x| x.trim().to_owned()).collect()
+            };
+            Self{title, authors: author_vec, num_pages, acquisition_date, start_date, end_date, price_ebook, price_paperback}
+        }
 }
 
 pub struct TemplateApp {
