@@ -4,7 +4,7 @@ use egui_extras::{Column, DatePickerButton, TableBuilder};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Pool;
 
-use crate::requests::Book;
+use crate::requests::{GoogleBooksAPI, Book};
 
 pub struct BookFromTable {
     title: String,
@@ -40,6 +40,7 @@ pub struct TemplateApp {
     query_str: String,
     db_connection: Pool<sqlx::Postgres>,
     table: Option<Vec<BookFromTable>>,
+    google_books_api: GoogleBooksAPI,
 }
 
 impl Default for TemplateApp {
@@ -57,12 +58,14 @@ impl Default for TemplateApp {
                     .await
             })
             .unwrap();
+        let api = GoogleBooksAPI {query_body: "https://www.googleapis.com/books/v1/volumes?q=".to_owned() };
 
         Self {
             // Example stuff:
             query_str: "".to_owned(),
             db_connection: pool,
             table: Option::None,
+            google_books_api: api,
         }
     }
 }
@@ -109,6 +112,7 @@ impl eframe::App for TemplateApp {
                 ui.text_edit_singleline(&mut self.query_str);
                 if ui.button("Search").clicked() {
                     println!("Searching for {}...", self.query_str);
+                    self.google_books_api.search(&self.query_str);
                 }
             });
 

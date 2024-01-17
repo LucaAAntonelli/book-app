@@ -3,6 +3,5 @@
 mod app;
 pub use app::TemplateApp;
 
-mod db;
-mod requests;
-// pub use db::all_books;
+pub mod db;
+pub mod requests;

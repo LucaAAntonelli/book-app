@@ -3,6 +3,32 @@ use serde::Deserialize;
 use serde_json::Value;
 use serde_json::{self, json};
 
+pub struct GoogleBooksAPI {
+    pub query_body: String,
+}
+
+impl GoogleBooksAPI {
+    pub async fn search(&self, query: &String) -> Result<String, reqwest::Error> {
+        let body = reqwest::get(format!("{}{}", &self.query_body, &query))
+            .await?
+            .text()
+            .await?;
+    
+        Ok(body)
+    }
+
+    pub fn json_to_books(&self, json: String) -> Vec<Book> {
+        let mut books: Vec<Book> = vec![];
+        let collection: Value = serde_json::from_str(&json).expect("Failed to parse JSON");
+        let items = &collection["items"].as_array();
+        for item in items.expect("Failed to iterate over JSON objects") {
+            books.push(Book::from(item.to_owned()));
+        }
+    
+        books
+    }
+}
+
 #[derive(Deserialize)]
 pub struct Book {
     pub title: String,
@@ -22,50 +48,19 @@ impl std::fmt::Display for Book {
     }
 }
 
-pub async fn search(query: String) -> Result<String, reqwest::Error> {
-    let body = reqwest::get("https://www.googleapis.com/books/v1/volumes?q=".to_owned() + &query)
-        .await?
-        .text()
-        .await?;
+impl std::convert::From<Value> for Book {
+    fn from(json: Value) -> Self {
+        let title = json["volumeInfo"]["title"].as_str().expect("Could not convert title to string").to_owned();
 
-    // println!("{body}");
-    Ok(body)
-}
+        let authors: Vec<String> = json["volumeInfo"]["authors"].as_array().unwrap_or(&vec![json!("None")]).iter().map(|v| v.as_str().expect("Failed to convert to string").to_owned()).collect();
+        let pages = json["volumeInfo"]["pageCount"].as_u64().unwrap_or_default();
 
-fn json_to_book(json: &Value) -> Book {
-    let title = json["volumeInfo"]["title"]
-        .as_str()
-        .expect("Could not convert title to string")
-        .to_owned();
-
-    let authors = json["volumeInfo"]["authors"]
-        .as_array()
-        .unwrap_or(&vec![json!("None")])
-        .iter()
-        .map(|v| {
-            v.as_str()
-                .expect("Could not convert author name to string")
-                .to_owned()
-        })
-        .collect();
-
-    let pages = json["volumeInfo"]["pageCount"].as_u64().unwrap_or_default();
-
-    Book {
-        title,
-        authors,
-        pages,
+        Self {
+            title,
+            authors,
+            pages
+        }
     }
 }
 
-pub fn json_to_books(json: String) -> Vec<Book> {
-    let mut books: Vec<Book> = vec![];
-    let collection: Value = serde_json::from_str(&json).expect("Failed to parse JSON");
-    let items = &collection["items"].as_array();
-    for item in items.expect("Failed to iterate over JSON objects") {
-        let book = json_to_book(item);
-        books.push(book);
-    }
 
-    books
-}
