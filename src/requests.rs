@@ -8,6 +8,11 @@ pub struct GoogleBooksAPI {
 }
 
 impl GoogleBooksAPI {
+
+    pub fn new() -> Self {
+        Self {query_body: String::from("https://www.googleapis.com/books/v1/volumes?q=")}
+    }
+
     pub async fn search(&self, query: &String) -> Result<String, reqwest::Error> {
         let body = reqwest::get(format!("{}{}", &self.query_body, &query))
             .await?
