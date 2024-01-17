@@ -9,7 +9,6 @@ async fn main() {
     let api = GoogleBooksAPI {query_body: "https://www.googleapis.com/books/v1/volumes?q=".to_owned()};
     println!("Enter book");
     io::stdin().read_line(&mut buffer).unwrap();
-    println!("{buffer}");
     let response = api.search(&buffer).await.unwrap();
     let books = api.json_to_books(response);
     for book in books {
