@@ -58,7 +58,7 @@ impl Default for TemplateApp {
                     .await
             })
             .unwrap();
-        let api = GoogleBooksAPI {query_body: "https://www.googleapis.com/books/v1/volumes?q=".to_owned() };
+        let api = GoogleBooksAPI::new();
 
         Self {
             // Example stuff:

@@ -4,7 +4,7 @@ use serde_json::Value;
 use serde_json::{self, json};
 
 pub struct GoogleBooksAPI {
-    pub query_body: String,
+    query_body: String,
 }
 
 impl GoogleBooksAPI {
