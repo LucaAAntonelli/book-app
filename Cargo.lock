@@ -583,6 +583,7 @@ dependencies = [
  "ehttp",
  "env_logger",
  "glutin 0.31.2",
+ "itertools",
  "log",
  "poll-promise",
  "reqwest",
