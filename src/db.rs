@@ -1,21 +1,48 @@
 use crate::app::BookFromTable;
-use crate::requests::Book;
 use chrono::NaiveDate;
+use sqlx::types::BigDecimal;
+use crate::requests::GoogleBooksAPI;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres, query};
+use std::io;
 
-pub struct DataBaseBook {
+pub struct Book {
     title: String,
-    authors: String,
-    
+    authors: Vec<String>,
+    pages: u64,
+    acquisition_date: NaiveDate,
+    start_date: Option<NaiveDate>,
+    end_date: Option<NaiveDate>,
+    price_ebook: Option<BigDecimal>,
+    price_paperback: Option<BigDecimal>
 }
 
-pub struct DataBase {
+impl Book {
+    pub async fn new(query: &String, date: NaiveDate) -> Self {
+        let api = GoogleBooksAPI::new();
+        let query_result = api.search(query).await.unwrap();
+        let books = api.json_to_books(query_result);
+        for (idx, book) in books.iter().enumerate() {
+            println!("{idx}:{book} ");
+        }
+        println!("Pick a book from the list: [0-9]");
+        let mut selection = String::new();
+        io::stdin().read_line(&mut selection).unwrap();
+        let selection = selection.trim();
+        let index = selection.parse::<usize>().unwrap();
+        let chosen_book = books[index].clone();
+       
+        println!("The book is {} by {:?}, bought on {}. It has {} pages", chosen_book.title, chosen_book.authors, date, chosen_book.pages);
+        Self {title: chosen_book.title, authors: chosen_book.authors, pages: chosen_book.pages, acquisition_date: date, start_date: Option::None, end_date: Option::None, price_ebook: Option::None, price_paperback: Option::None}
+    }
+}
+
+pub struct DataBaseConnection {
     database_url: String,
     pool: Pool<sqlx::Postgres>,
 }
 
-impl DataBase {
+impl DataBaseConnection {
 
     pub async fn new(database_url: &str) -> Result<Self, sqlx::Error> {
         
@@ -25,12 +52,16 @@ impl DataBase {
         Ok(database)
     }
 
-    pub async fn insert_book(&self, book: &Book) -> Result<(), sqlx::Error> {
+    pub async fn insert_book(&self, book: Book) -> Result<(), sqlx::Error> {
         sqlx::query!(
-            "INSERT INTO Books (title, num_pages, acquisition_date) VALUES ($1, $2, $3)",
+            "INSERT INTO Books (title, num_pages, acquisition_date, start_date, end_date, price_ebook, price_paperback) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (title, num_pages, acquisition_date) DO NOTHING",
             book.title,
             book.pages as i32,
-            NaiveDate::from_ymd_opt(2021, 01, 01)
+            book.acquisition_date,
+            book.start_date,
+            book.end_date,
+            book.price_ebook,
+            book.price_paperback
         )
         .execute(&self.pool)
         .await?;
@@ -49,32 +80,32 @@ impl DataBase {
         Ok(())
     }
 
-    pub async fn all_authors(&self) -> Result<(), sqlx::Error> {
-        let query_result = sqlx::query!("SELECT * FROM Authors")
-            .fetch_all(&self.pool)
-            .await?;
-        for row in query_result {
-            println!("{:?}", row);
-        }
+//     pub async fn all_authors(&self) -> Result<(), sqlx::Error> {
+//         let query_result = sqlx::query!("SELECT * FROM Authors")
+//             .fetch_all(&self.pool)
+//             .await?;
+//         for row in query_result {
+//             println!("{:?}", row);
+//         }
     
-        Ok(())
-    }
+//         Ok(())
+//     }
 
-    pub async fn alter_start_date(&self, book_id: i32, start_date: NaiveDate) -> Result<(), sqlx::Error> {
-        sqlx::query!("UPDATE Books SET start_date = $1 WHERE book_id = $2", start_date, book_id)
-        .execute(&self.pool)
-        .await?;
+//     pub async fn alter_start_date(&self, book_id: i32, start_date: NaiveDate) -> Result<(), sqlx::Error> {
+//         sqlx::query!("UPDATE Books SET start_date = $1 WHERE book_id = $2", start_date, book_id)
+//         .execute(&self.pool)
+//         .await?;
     
-        Ok(())
-    }
+//         Ok(())
+//     }
     
-    pub async fn alter_end_date(&self, book_id: i32, end_date: NaiveDate) -> Result<(), sqlx::Error> {
-        sqlx::query!("UPDATE Books SET end_date = $1 WHERE book_id = $2", end_date, book_id)
-        .execute(&self.pool)
-        .await?;
+//     pub async fn alter_end_date(&self, book_id: i32, end_date: NaiveDate) -> Result<(), sqlx::Error> {
+//         sqlx::query!("UPDATE Books SET end_date = $1 WHERE book_id = $2", end_date, book_id)
+//         .execute(&self.pool)
+//         .await?;
     
-        Ok(())
-    }
+//         Ok(())
+//     }
 }
 
 
@@ -88,15 +119,15 @@ impl DataBase {
 
 
 
-pub async fn all_references(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
-    let query_result = sqlx::query!("SELECT * FROM BookAuthors")
-        .fetch_all(pool)
-        .await?;
-    for row in query_result {
-        println!("{:?}", row);
-    }
-    Ok(())
-}
+// pub async fn all_references(pool: &Pool<sqlx::Postgres>) -> Result<(), sqlx::Error> {
+//     let query_result = sqlx::query!("SELECT * FROM BookAuthors")
+//         .fetch_all(pool)
+//         .await?;
+//     for row in query_result {
+//         println!("{:?}", row);
+//     }
+//     Ok(())
+// }
 
 
 
