@@ -13,7 +13,7 @@ async fn main() {
             let author = &row[0].as_string().unwrap();
             let title = &row[1].as_string().unwrap();
             if let DataType::DateTime(num_days) = row[2] {
-                let acquisition_date = NaiveDate::from_ymd_opt(1899, 12, 30).unwrap() + Duration::days(num_days as i64);
+                let acquisition_date = NaiveDate::from_ymd_opt(1899, 12, 30).unwrap() + Duration::days(num_days as i64); // Copmute date with Excel period date, add number of days found in Excel sheet
                 let query = format!("{title} {author}");
                 println!("{query}");
                 let selected_book = Book::new(&query, acquisition_date).await;
