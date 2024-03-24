@@ -1,11 +1,10 @@
 use crate::app::BookFromTable;
 use chrono::NaiveDate;
 use sqlx::types::BigDecimal;
-use crate::requests::GoogleBooksAPI;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres, query};
 use std::io;
-
+use goodreads_api::goodreads_api;
 pub struct Book {
     title: String,
     authors: Vec<String>,
@@ -19,21 +18,14 @@ pub struct Book {
 
 impl Book {
     pub async fn new(query: &String, date: NaiveDate) -> Self {
-        let api = GoogleBooksAPI::new();
-        let query_result = api.search(query).await.unwrap();
-        let books = api.json_to_books(query_result);
-        for (idx, book) in books.iter().enumerate() {
-            println!("{idx}:{book} ");
-        }
-        println!("Pick a book from the list: [0-9]");
-        let mut selection = String::new();
-        io::stdin().read_line(&mut selection).unwrap();
-        let selection = selection.trim();
-        let index = selection.parse::<usize>().unwrap();
-        let chosen_book = books[index].clone();
-       
-        println!("The book is {} by {:?}, bought on {}. It has {} pages", chosen_book.title, chosen_book.authors, date, chosen_book.pages);
-        Self {title: chosen_book.title, authors: chosen_book.authors, pages: chosen_book.pages, acquisition_date: date, start_date: Option::None, end_date: Option::None, price_ebook: Option::None, price_paperback: Option::None}
+        let chosen_book = goodreads_api::search(query).await;
+        
+        let title = chosen_book.get_title();
+        let authors = chosen_book.get_authors();
+        let pages = chosen_book.get_pages();
+        
+        println!("The book is {} by {:?}, bought on {}. It has {} pages", title, authors, date, &pages);
+        Self {title: title.to_string(), authors: authors.to_vec(), pages, acquisition_date: date, start_date: Option::None, end_date: Option::None, price_ebook: Option::None, price_paperback: Option::None}
     }
 }
 
@@ -53,18 +45,7 @@ impl DataBaseConnection {
     }
 
     pub async fn insert_book(&self, book: Book) -> Result<(), sqlx::Error> {
-        sqlx::query!(
-            "INSERT INTO Books (title, num_pages, acquisition_date, start_date, end_date, price_ebook, price_paperback) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (title, num_pages, acquisition_date) DO NOTHING",
-            book.title,
-            book.pages as i32,
-            book.acquisition_date,
-            book.start_date,
-            book.end_date,
-            book.price_ebook,
-            book.price_paperback
-        )
-        .execute(&self.pool)
-        .await?;
+        
     
         for author in &book.authors {
             sqlx::query!(
