@@ -42,10 +42,10 @@ impl DataBaseConnection {
         Ok(database)
     }
 
-    pub async fn insert_book(&self, book: Book) -> Result<(), sqlx::Error> {
+    pub async fn insert_owned_book(&self, book: Book) -> Result<(), sqlx::Error> {
         
         sqlx::query!(
-            "INSERT INTO Books (title, num_pages, acquisition_date) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+            "INSERT INTO owned_books (title, num_pages, acquisition_date) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
             book.title,
             book.pages as i32,
             book.acquisition_date
@@ -53,19 +53,35 @@ impl DataBaseConnection {
     
         for author in &book.authors {
             sqlx::query!(
-                "INSERT INTO Authors (name) VALUES ($1) ON CONFLICT (name) DO NOTHING",
+                "INSERT INTO authors (name) VALUES ($1) ON CONFLICT (name) DO NOTHING",
                 author.to_owned()
             )
             .execute(&self.pool)
             .await?;
-            sqlx::query!("INSERT INTO BookAuthors (book_id, author_id) VALUES ((SELECT book_id FROM Books WHERE title = $1), (SELECT author_id FROM Authors WHERE name = $2)) ON CONFLICT DO NOTHING", book.title, author).execute(&self.pool).await?;
+            sqlx::query!("INSERT INTO book_authors (book_id, author_id) VALUES ((SELECT book_id FROM owned_books WHERE title = $1), (SELECT author_id FROM authors WHERE name = $2)) ON CONFLICT DO NOTHING", book.title, author).execute(&self.pool).await?;
         }
     
         Ok(())
     }
 
+    pub async fn start_new_book(&self, book_id: i32, start_date: NaiveDate) -> Result<(), sqlx::Error> {
+        sqlx::query!("INSERT INTO read_books (book_id, start_date) VALUES ($1, $2)", book_id, start_date)
+        .execute(&self.pool)
+        .await?;
+    
+        Ok(())
+    }
+
+    pub async fn finished_book(&self, book_id: i32, end_date: NaiveDate) -> Result<(), sqlx::Error> {
+        sqlx::query!("UPDATE read_books SET end_date = $1 WHERE book_id = $2", end_date, book_id)
+        .execute(&self.pool)
+        .await?;
+    
+        Ok(())
+    }
+
     pub async fn all_authors(&self) -> Result<(), sqlx::Error> {
-        let query_result = sqlx::query!("SELECT * FROM Authors")
+        let query_result = sqlx::query!("SELECT * FROM authors")
             .fetch_all(&self.pool)
             .await?;
         for row in query_result {
@@ -76,7 +92,7 @@ impl DataBaseConnection {
     }
 
     pub async fn alter_start_date(&self, book_id: i32, start_date: NaiveDate) -> Result<(), sqlx::Error> {
-        sqlx::query!("UPDATE Books SET start_date = $1 WHERE book_id = $2", start_date, book_id)
+        sqlx::query!("UPDATE read_books SET start_date = $1 WHERE book_id = $2", start_date, book_id)
         .execute(&self.pool)
         .await?;
     
@@ -84,7 +100,7 @@ impl DataBaseConnection {
     }
     
     pub async fn alter_end_date(&self, book_id: i32, end_date: NaiveDate) -> Result<(), sqlx::Error> {
-        sqlx::query!("UPDATE Books SET end_date = $1 WHERE book_id = $2", end_date, book_id)
+        sqlx::query!("UPDATE read_books SET end_date = $1 WHERE book_id = $2", end_date, book_id)
         .execute(&self.pool)
         .await?;
     

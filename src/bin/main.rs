@@ -1,3 +1,4 @@
+#![warn(clippy::all, rust_2018_idioms)]
 use book_app::db::{DataBaseConnection, Book};
 use calamine::{Reader, open_workbook, Xlsx, DataType};
 use chrono::{Duration, NaiveDate};
@@ -17,7 +18,7 @@ async fn main() {
                 let query = format!("{title} {author}");
                 println!("{query}");
                 let selected_book = Book::new(&query, acquisition_date).await;
-                match database.insert_book(selected_book).await {
+                match database.insert_owned_book(selected_book).await {
                 // TODO: Add functionality to notify whenever a book was already in the database
                 Ok(_) => println!("Successfully written to database"),
                 Err(e) => println!("Error while writing to database: {e}")
