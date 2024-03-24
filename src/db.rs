@@ -44,6 +44,12 @@ impl DataBaseConnection {
 
     pub async fn insert_book(&self, book: Book) -> Result<(), sqlx::Error> {
         
+        sqlx::query!(
+            "INSERT INTO Books (title, num_pages, acquisition_date) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+            book.title,
+            book.pages as i32,
+            book.acquisition_date
+        ).execute(&self.pool).await?;
     
         for author in &book.authors {
             sqlx::query!(
@@ -52,8 +58,9 @@ impl DataBaseConnection {
             )
             .execute(&self.pool)
             .await?;
-    
+            println!("Right before troublesome query");
             sqlx::query!("INSERT INTO BookAuthors (book_id, author_id) VALUES ((SELECT book_id FROM Books WHERE title = $1), (SELECT author_id FROM Authors WHERE name = $2)) ON CONFLICT DO NOTHING", book.title, author).execute(&self.pool).await?;
+            println!("Right after troublesome query");
         }
     
         Ok(())
