@@ -58,9 +58,7 @@ impl DataBaseConnection {
             )
             .execute(&self.pool)
             .await?;
-            println!("Right before troublesome query");
             sqlx::query!("INSERT INTO BookAuthors (book_id, author_id) VALUES ((SELECT book_id FROM Books WHERE title = $1), (SELECT author_id FROM Authors WHERE name = $2)) ON CONFLICT DO NOTHING", book.title, author).execute(&self.pool).await?;
-            println!("Right after troublesome query");
         }
     
         Ok(())
