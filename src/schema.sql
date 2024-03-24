@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS owned_books, read_books, authors, book_authors;
 
 CREATE TABLE owned_books (
     book_id SERIAL PRIMARY KEY,
-    title VARCHAR(63) NOT NULL,
+    title VARCHAR(63) UNIQUE NOT NULL,
     num_pages INTEGER NOT NULL,
     acquisition_date DATE NOT NULL,
     price_ebook DECIMAL(5,2),
@@ -12,7 +12,6 @@ CREATE TABLE owned_books (
 
 CREATE TABLE read_books (
     book_id INTEGER REFERENCES owned_books(book_id) ON DELETE CASCADE,
-    PRIMARY KEY (book_id),
     start_date DATE,
     end_date DATE,
     CONSTRAINT check_order CHECK (start_date <= end_date)
