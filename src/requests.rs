@@ -34,7 +34,7 @@ impl GoogleBooksAPI {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Book {
     pub title: String,
     pub authors: Vec<String>,
