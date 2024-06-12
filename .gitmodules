@@ -1,0 +1,3 @@
+[submodule "goodreads-api"]
+	path = goodreads-api
+	url = https://github.com/LucaAAntonelli/goodreads-api

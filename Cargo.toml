@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+goodreads-api = {path = "goodreads-api"}
 sqlx = { version = "0.7.2", features = ["postgres", "runtime-tokio", "macros", "chrono", "bigdecimal"] }
 tokio = { version = "1.34", features = ["full"] }
 chrono = { version = "0.4.31" }
@@ -30,6 +31,7 @@ poll-promise = "0.3.0"
 egui_demo_lib = "0.23.0"
 glutin = "0.31.2"
 itertools = "0.12.0"
+dylib = "0.0.3"
 [profile.release]
 opt-level = 2 # fast and small wasm
 
