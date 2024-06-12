@@ -21,7 +21,7 @@ async fn main() {
                 // TODO: Add functionality to notify whenever a book was already in the database
                 Ok(_) => println!("Successfully written to database"),
                 Err(e) => println!("Error while writing to database: {e}")
-        }
+                }
             }
                 
             
