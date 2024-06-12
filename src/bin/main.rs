@@ -4,6 +4,7 @@ use calamine::{Reader, open_workbook, Xlsx, DataType};
 use chrono::{Duration, NaiveDate};
 #[tokio::main]
 async fn main() {
+    // Todo: make this value hardware-dependent
     let excel_path = "/mnt/c/Users/lucaa/polybox/books_in_possession.xlsx";
     
     let mut workbook: Xlsx<_> = open_workbook(excel_path).expect("Error opening workbook");
