@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE read_books SET end_date = $1 WHERE book_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Date",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6bc6ee9216a4909f30b8a2e41c6a842794869212ebf65eb6617a67328e6cea59"
+}

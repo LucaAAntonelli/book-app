@@ -7,7 +7,7 @@ async fn main() {
     let excel_path = "/mnt/c/Users/lucaa/polybox/books_in_possession.xlsx";
     
     let mut workbook: Xlsx<_> = open_workbook(excel_path).expect("Error opening workbook");
-    let db_uri = "postgres://postgres:mysecretpassword@mypostgres.crzu5du3w8kg.eu-north-1.rds.amazonaws.com:5432/bookdb";
+    let db_uri = "postgres://root:p7Raw%2637j43ngcJLHrWg@postgres.lucaantonelli.synology.me:2665/book_DB";
     let database = DataBaseConnection::new(db_uri).await.unwrap();
     if let Ok(range) = workbook.worksheet_range("Tabelle1") {
         for row in range.rows(){

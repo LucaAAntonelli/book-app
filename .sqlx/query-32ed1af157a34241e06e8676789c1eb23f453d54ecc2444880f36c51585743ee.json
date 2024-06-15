@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO book_authors (book_id, author_id) VALUES ((SELECT book_id FROM owned_books WHERE title = $1), (SELECT author_id FROM authors WHERE name = $2)) ON CONFLICT DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "32ed1af157a34241e06e8676789c1eb23f453d54ecc2444880f36c51585743ee"
+}
