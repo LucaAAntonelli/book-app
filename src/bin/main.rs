@@ -6,6 +6,7 @@ use dotenv::dotenv;
 use std::env;
 #[tokio::main]
 async fn main() {
+    dotenv().ok();
     // Todo: make this value hardware-dependent
     let excel_path = "/mnt/c/Users/lucaa/polybox/books_in_possession.xlsx";
     
