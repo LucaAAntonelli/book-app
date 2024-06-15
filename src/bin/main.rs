@@ -2,14 +2,16 @@
 use book_app::db::{DataBaseConnection, Book};
 use calamine::{Reader, open_workbook, Xlsx, DataType};
 use chrono::{Duration, NaiveDate};
+use dotenv::dotenv;
+use std::env;
 #[tokio::main]
 async fn main() {
     // Todo: make this value hardware-dependent
     let excel_path = "/mnt/c/Users/lucaa/polybox/books_in_possession.xlsx";
     
     let mut workbook: Xlsx<_> = open_workbook(excel_path).expect("Error opening workbook");
-    let db_uri = "postgres://root:p7Raw%2637j43ngcJLHrWg@postgres.lucaantonelli.synology.me:2665/book_DB";
-    let database = DataBaseConnection::new(db_uri).await.unwrap();
+    let db_uri = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database = DataBaseConnection::new(&db_uri).await.unwrap();
     if let Ok(range) = workbook.worksheet_range("Tabelle1") {
         for row in range.rows(){
             let author = &row[0].as_string().unwrap();
