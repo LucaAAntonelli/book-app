@@ -15,12 +15,11 @@ pub struct Book {
 }
 
 impl Book {
-    pub async fn new(query: &String, date: NaiveDate) -> Self {
-        let chosen_book = goodreads_api::search(query).await;
+    pub fn new(book: &goodreads_api::GoodreadsBook, date: NaiveDate) -> Self {
         
-        let title = chosen_book.get_title();
-        let authors = chosen_book.get_authors();
-        let pages = chosen_book.get_pages();
+        let title = book.title();
+        let authors = book.authors();
+        let pages = book.pages();
         
         println!("The book is {} by {:?}, bought on {}. It has {} pages", title, authors, date, &pages);
         Self {title: title.to_string(), authors: authors.to_vec(), pages, acquisition_date: date, start_date: Option::None, end_date: Option::None, price_ebook: Option::None, price_paperback: Option::None}
