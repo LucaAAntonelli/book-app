@@ -1,7 +1,12 @@
 [package]
 name = "book-app"
 version = "0.1.0"
+authors = ["Luca Antonelli <luca.antonelli@gmx.ch>"]
 edition = "2021"
+
+[package.metadata.docs.rs]
+all-features = true
+targets = ["x86_64-unknown-linux-gnu"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -14,8 +19,8 @@ chrono = { version = "0.4.31" }
 reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.107"
-egui = "0.23.0"
-eframe = { version = "0.23.0", default-features = false, features = [
+egui = "0.27.0"
+eframe = { version = "0.27.0", default-features = false, features = [
     "accesskit",
     "default_fonts",
     "glow",
@@ -39,3 +44,6 @@ opt-level = 2 # fast and small wasm
 # Optimize all dependencies even in debug builds:
 [profile.dev.package."*"]
 opt-level = 2
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+env_logger = "0.10"
