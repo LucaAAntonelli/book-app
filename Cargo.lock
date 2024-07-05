@@ -519,12 +519,6 @@ dependencies = [
 
 [[package]]
 name = "base64"
-version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
-
-[[package]]
-name = "base64"
 version = "0.21.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
@@ -641,8 +635,8 @@ dependencies = [
  "eframe",
  "egui 0.27.2",
  "egui_demo_lib",
- "egui_extras",
- "ehttp",
+ "egui_extras 0.27.2",
+ "ehttp 0.3.1",
  "env_logger",
  "glutin",
  "goodreads-api",
@@ -1006,9 +1000,9 @@ checksum = "96a6ac251f4a2aca6b3f91340350eab87ae57c3f127ffeb585e92bd336717991"
 
 [[package]]
 name = "data-url"
-version = "0.2.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d7439c3735f405729d52c3fbbe4de140eaf938a1fe47d227c27f8254d4302a5"
+checksum = "5c297a1c74b71ae29df00c3e22dd9534821d60eb9af5a0192823fa2acea70c2a"
 
 [[package]]
 name = "der"
@@ -1258,7 +1252,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "157bdb4408d324d9035c1b5cc517c6c4f0b8067195a931402a282c464f366cd7"
 dependencies = [
  "egui 0.23.0",
- "egui_extras",
+ "egui_extras 0.23.0",
  "egui_plot",
  "log",
  "unicode_names2",
@@ -1270,17 +1264,28 @@ version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68ffe3fe5c00295f91c2a61a74ee271c32f74049c94ba0b1cea8f26eb478bc07"
 dependencies = [
- "chrono",
  "egui 0.23.0",
- "ehttp",
+ "enum-map",
+ "log",
+ "mime_guess",
+ "serde",
+]
+
+[[package]]
+name = "egui_extras"
+version = "0.27.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b78779f35ded1a853786c9ce0b43fe1053e10a21ea3b23ebea411805ce41593"
+dependencies = [
+ "chrono",
+ "egui 0.27.2",
+ "ehttp 0.5.0",
  "enum-map",
  "image",
  "log",
- "mime_guess",
+ "mime_guess2",
  "resvg",
  "serde",
- "tiny-skia",
- "usvg",
 ]
 
 [[package]]
@@ -1312,6 +1317,20 @@ name = "ehttp"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f88f45662356f96afc7d9e2bc9910ad8352ee01417f7c69b8b16a53c8767a75d"
+dependencies = [
+ "document-features",
+ "js-sys",
+ "ureq",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
+name = "ehttp"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "59a81c221a1e4dad06cb9c9deb19aea1193a5eea084e8cd42d869068132bf876"
 dependencies = [
  "document-features",
  "js-sys",
@@ -2169,9 +2188,9 @@ dependencies = [
 
 [[package]]
 name = "imagesize"
-version = "0.10.1"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df19da1e92fbfec043ca97d622955381b1f3ee72a180ec999912df31b1ccd951"
+checksum = "029d73f573d8e8d63e6d5020011d3255b28c3ba85d6cf870a07184ed23de9284"
 
 [[package]]
 name = "indexmap"
@@ -2298,9 +2317,9 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 
 [[package]]
 name = "kurbo"
-version = "0.8.3"
+version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a53776d271cfb873b17c618af0298445c88afc52837f3e948fa3fafd131f449"
+checksum = "bd85a5776cd9500c2e2059c8c76c3b01528566b7fcbaf8098b55a33fc298849b"
 dependencies = [
  "arrayvec",
 ]
@@ -2492,6 +2511,16 @@ name = "mime_guess"
 version = "2.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4192263c238a5f0d0c6bfd21f336a313a4ce1c450542449ca191bb657b4642ef"
+dependencies = [
+ "mime",
+ "unicase",
+]
+
+[[package]]
+name = "mime_guess2"
+version = "2.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25a3333bb1609500601edc766a39b4c1772874a4ce26022f4d866854dc020c41"
 dependencies = [
  "mime",
  "unicase",
@@ -3349,7 +3378,7 @@ version = "0.11.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37b1ae8d9ac08420c66222fb9096fc5de435c3c48542bc5336c51892cffafb41"
 dependencies = [
- "base64 0.21.7",
+ "base64",
  "bytes",
  "encoding_rs",
  "futures-core",
@@ -3383,9 +3412,9 @@ dependencies = [
 
 [[package]]
 name = "resvg"
-version = "0.28.0"
+version = "0.37.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c115863f2d3621999cf187e318bc92b16402dfeff6a48c74df700d77381394c1"
+checksum = "cadccb3d99a9efb8e5e00c16fbb732cbe400db2ec7fc004697ee7d97d86cf1f4"
 dependencies = [
  "log",
  "pico-args",
@@ -3424,7 +3453,7 @@ version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b91f7eff05f748767f183df4320a63d6936e9c6107d97c9e6bdd9784f4289c94"
 dependencies = [
- "base64 0.21.7",
+ "base64",
  "bitflags 2.4.1",
  "serde",
  "serde_derive",
@@ -3432,12 +3461,9 @@ dependencies = [
 
 [[package]]
 name = "roxmltree"
-version = "0.15.1"
+version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b9de9831a129b122e7e61f242db509fa9d0838008bf0b29bb0624669edfe48a"
-dependencies = [
- "xmlparser",
-]
+checksum = "3cd14fd5e3b777a7422cca79358c57a8f6e3a703d9ac187448d0daf220c2407f"
 
 [[package]]
 name = "rsa"
@@ -3987,7 +4013,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e37195395df71fd068f6e2082247891bc11e3289624bbc776a0cdfa1ca7f1ea4"
 dependencies = [
  "atoi",
- "base64 0.21.7",
+ "base64",
  "bigdecimal",
  "bitflags 2.4.1",
  "byteorder",
@@ -4031,7 +4057,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6ac0ac3b7ccd10cc96c7ab29791a7dd236bd94021f31eec7ba3d46a74aa1c24"
 dependencies = [
  "atoi",
- "base64 0.21.7",
+ "base64",
  "bigdecimal",
  "bitflags 2.4.1",
  "byteorder",
@@ -4162,10 +4188,11 @@ checksum = "81cdd64d312baedb58e21336b31bc043b77e01cc99033ce76ef539f78e965ebc"
 
 [[package]]
 name = "svgtypes"
-version = "0.8.2"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22975e8a2bac6a76bb54f898a6b18764633b00e780330f0b689f65afb3975564"
+checksum = "6e44e288cd960318917cbd540340968b90becc8bc81f171345d706e7a89d9d70"
 dependencies = [
+ "kurbo",
  "siphasher",
 ]
 
@@ -4273,23 +4300,24 @@ dependencies = [
 
 [[package]]
 name = "tiny-skia"
-version = "0.8.4"
+version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df8493a203431061e901613751931f047d1971337153f96d0e5e363d6dbf6a67"
+checksum = "83d13394d44dae3207b52a326c0c85a8bf87f1541f23b0d143811088497b09ab"
 dependencies = [
  "arrayref",
  "arrayvec",
  "bytemuck",
  "cfg-if",
+ "log",
  "png",
  "tiny-skia-path",
 ]
 
 [[package]]
 name = "tiny-skia-path"
-version = "0.8.4"
+version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adbfb5d3f3dd57a0e11d12f4f13d4ebbbc1b5c15b7ab0a156d030b21da5f677c"
+checksum = "9c9e7fc0c2e86a30b117d0462aa261b72b7a99b7ebd7deb3a14ceda95c5bdc93"
 dependencies = [
  "arrayref",
  "bytemuck",
@@ -4539,7 +4567,7 @@ version = "2.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8cdd25c339e200129fe4de81451814e5228c9b771d57378817d6117cc2b3f97"
 dependencies = [
- "base64 0.21.7",
+ "base64",
  "flate2",
  "log",
  "once_cell",
@@ -4568,22 +4596,46 @@ checksum = "daf8dba3b7eb870caf1ddeed7bc9d2a049f3cfdfae7cb521b087cc33ae4c49da"
 
 [[package]]
 name = "usvg"
-version = "0.28.0"
+version = "0.37.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b5b7c2b30845b3348c067ca3d09e20cc6e327c288f0ca4c48698712abf432e9"
+checksum = "38b0a51b72ab80ca511d126b77feeeb4fb1e972764653e61feac30adc161a756"
 dependencies = [
- "base64 0.13.1",
+ "base64",
+ "log",
+ "pico-args",
+ "usvg-parser",
+ "usvg-tree",
+ "xmlwriter",
+]
+
+[[package]]
+name = "usvg-parser"
+version = "0.37.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9bd4e3c291f45d152929a31f0f6c819245e2921bfd01e7bd91201a9af39a2bdc"
+dependencies = [
  "data-url",
  "flate2",
  "imagesize",
  "kurbo",
  "log",
- "rctree",
  "roxmltree",
  "simplecss",
  "siphasher",
+ "svgtypes",
+ "usvg-tree",
+]
+
+[[package]]
+name = "usvg-tree"
+version = "0.37.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ee3d202ebdb97a6215604b8f5b4d6ef9024efd623cf2e373a6416ba976ec7d3"
+dependencies = [
+ "rctree",
  "strict-num",
  "svgtypes",
+ "tiny-skia-path",
 ]
 
 [[package]]
@@ -5308,10 +5360,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fcb9cbac069e033553e8bb871be2fbdffcab578eb25bd0f7c508cedc6dcd75a"
 
 [[package]]
-name = "xmlparser"
-version = "0.13.6"
+name = "xmlwriter"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66fee0b777b0f5ac1c69bb06d361268faafa61cd4682ae064a171c16c433e9e4"
+checksum = "ec7a2a501ed189703dba8b08142f057e887dfc4b2cc4db2d343ac6376ba3e0b9"
 
 [[package]]
 name = "zbus"

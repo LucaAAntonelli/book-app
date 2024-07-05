@@ -1,3 +1,4 @@
+use egui_extras::{Column, TableBuilder};
 use goodreads_api::goodreads_api;
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -64,7 +65,7 @@ impl eframe::App for TemplateApp {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("Book Tracker");
 
-            ui.horizontal(|ui| {
+            ui.horizontal(|ui| { 
                 ui.label("Enter Query: ");
                 ui.text_edit_singleline(&mut self.label);
                 if ui.button("Enter").clicked() {
@@ -75,12 +76,38 @@ impl eframe::App for TemplateApp {
                     }
                 }
             });
+            ui.horizontal(|ui| {
+                let mut table = TableBuilder::new(ui)
+                    .striped(true)
+                    .cell_layout(egui::Layout::left_to_right(egui::Align::Center))
+                    .column(Column::auto())
+                    .column(Column::auto())
+                    .column(Column::initial(100.0).range(40.0..=300.0))
+                    .column(Column::initial(100.0).at_least(40.0).clip(true))
+                    .column(Column::remainder())
+                    .min_scrolled_height(0.0);
 
-            
-
-           
-
-            
+                
+                    table
+                        .header(20.0, |mut header| {
+                            header.col(|ui| {
+                                ui.strong("Row");
+                            });
+                            header.col(|ui| {
+                                ui.strong("Interaction");
+                            });
+                            header.col(|ui| {
+                                ui.strong("Expanding content");
+                            });
+                            header.col(|ui| {
+                                ui.strong("Clipped text");
+                            });
+                            header.col(|ui| {
+                                ui.strong("Content");
+                            });
+                        });
+            });    
         });
+            
     }
 }
