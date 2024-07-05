@@ -1,17 +1,11 @@
-To set up Docker:
-```
-docker pull postgres
-docker run --name bookdb -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
-```
+# Book Tracker
+A personal application that combines my love for books with my passion for Rust programming. 
 
-Then, set the SQL schema:
+# Feature Overview
+- [x] Integrate Goodreads web scraper to query for books online and gain metadata like number of pages, author(s), book series, ...
+- [x] Create SQL database to keep track of reading progress
+- [ ] Create GUI application to
+  - [ ] Add new books
+  - [ ] Update progress
+  - [ ] View data about reading progress
 
-```
-psql -h localhost -U postgres -d postgres -f src/schema.sql
-```
-
-To set up sqlx:
-
-```
-cargo sqlx prepare --database-url postgres://postgres:mysecretpassword@localhost/postgres
-```
