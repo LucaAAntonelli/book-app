@@ -1,3 +1,4 @@
+use goodreads_api::goodreads_api;
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -66,6 +67,13 @@ impl eframe::App for TemplateApp {
             ui.horizontal(|ui| {
                 ui.label("Enter Query: ");
                 ui.text_edit_singleline(&mut self.label);
+                if ui.button("Enter").clicked() {
+                    // Do something when the button is clicked
+                    let books = goodreads_api::GoodreadsBook::search(self.label.as_str());
+                    for book in books {
+                        println!("{book}");
+                    }
+                }
             });
 
             
