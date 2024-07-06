@@ -77,10 +77,12 @@ impl eframe::App for TemplateApp {
                         println!("{book}");
                     }
                 }
+                
             });
-            ui.horizontal(|ui| {
-               table_ui(ui, vec![]); 
+            ui.vertical(|ui| {
+                table_ui(ui, vec![]); 
             });
+            
             
     });
 }
@@ -89,7 +91,7 @@ impl eframe::App for TemplateApp {
 fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
     TableBuilder::new(ui)
                     .column(Column::auto().resizable(true))
-                    .column(Column::remainder())
+                    .column(Column::auto().resizable(true))
                     .header(20.0, |mut header| {
                         header.col(|ui| {
                             ui.heading("First column");
@@ -99,7 +101,7 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
                         });
                     })
                     .body(|mut body| {
-                        body.row(30.0, |mut row| {
+                        body.row(20.0, |mut row| {
                             row.col(|ui| {
                                 ui.label("Hello");
                             });
