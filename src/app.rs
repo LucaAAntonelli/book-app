@@ -77,37 +77,29 @@ impl eframe::App for TemplateApp {
                 }
             });
             ui.horizontal(|ui| {
-                let mut table = TableBuilder::new(ui)
-                    .striped(true)
-                    .cell_layout(egui::Layout::left_to_right(egui::Align::Center))
-                    .column(Column::auto())
-                    .column(Column::auto())
-                    .column(Column::initial(100.0).range(40.0..=300.0))
-                    .column(Column::initial(100.0).at_least(40.0).clip(true))
+                TableBuilder::new(ui)
+                    .column(Column::auto().resizable(true))
                     .column(Column::remainder())
-                    .min_scrolled_height(0.0);
-
-                
-                    table
-                        .header(20.0, |mut header| {
-                            header.col(|ui| {
-                                ui.strong("Row");
+                    .header(20.0, |mut header| {
+                        header.col(|ui| {
+                            ui.heading("First column");
+                        });
+                        header.col(|ui| {
+                            ui.heading("Second column");
+                        });
+                    })
+                    .body(|mut body| {
+                        body.row(30.0, |mut row| {
+                            row.col(|ui| {
+                                ui.label("Hello");
                             });
-                            header.col(|ui| {
-                                ui.strong("Interaction");
-                            });
-                            header.col(|ui| {
-                                ui.strong("Expanding content");
-                            });
-                            header.col(|ui| {
-                                ui.strong("Clipped text");
-                            });
-                            header.col(|ui| {
-                                ui.strong("Content");
+                            row.col(|ui| {
+                                ui.button("world!");
                             });
                         });
-            });    
-        });
+                    });
+            });
             
-    }
+    });
+}
 }
