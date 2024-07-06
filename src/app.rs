@@ -1,5 +1,7 @@
+use egui::Ui;
 use egui_extras::{Column, TableBuilder};
 use goodreads_api::goodreads_api;
+use ::goodreads_api::goodreads_api::GoodreadsBook;
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -77,7 +79,15 @@ impl eframe::App for TemplateApp {
                 }
             });
             ui.horizontal(|ui| {
-                TableBuilder::new(ui)
+               table_ui(ui, vec![]); 
+            });
+            
+    });
+}
+}
+
+fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
+    TableBuilder::new(ui)
                     .column(Column::auto().resizable(true))
                     .column(Column::remainder())
                     .header(20.0, |mut header| {
@@ -98,8 +108,4 @@ impl eframe::App for TemplateApp {
                             });
                         });
                     });
-            });
-            
-    });
-}
 }
