@@ -8,14 +8,15 @@ use ::goodreads_api::goodreads_api::GoodreadsBook;
 pub struct TemplateApp {
     // Example stuff:
     label: String,
-
+    books: Vec<GoodreadsBook>
 }
 
 impl Default for TemplateApp {
     fn default() -> Self {
         Self {
             // Example stuff:
-            label: "Hello World!".to_owned()
+            label: "Hello World!".to_owned(),
+            books: vec![]
         }
     }
 }
@@ -72,15 +73,15 @@ impl eframe::App for TemplateApp {
                 ui.text_edit_singleline(&mut self.label);
                 if ui.button("Enter").clicked() {
                     // Do something when the button is clicked
-                    let books = goodreads_api::GoodreadsBook::search(self.label.as_str());
-                    for book in books {
+                    self.books = goodreads_api::GoodreadsBook::search(self.label.as_str());
+                    for book in &self.books {
                         println!("{book}");
                     }
                 }
                 
             });
             ui.vertical(|ui| {
-                table_ui(ui, vec![]); 
+                table_ui(ui, self.books.clone()); 
             });
             
             
