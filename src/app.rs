@@ -1,7 +1,10 @@
+use std::sync::{Arc, Mutex};
+
 use egui::{Spinner, Ui};
 use egui_extras::{Column, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
-use tokio::runtime::Runtime;
+use tokio::runtime::{Handle, Runtime};
+use tokio::sync::mpsc;
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -13,7 +16,7 @@ pub struct TemplateApp {
     #[serde(skip)]
     search_button_clicked: bool,
     #[serde(skip)]
-    rt: Runtime,
+    rt: tokio::runtime::Runtime,
 }
 
 impl Default for TemplateApp {
@@ -23,7 +26,7 @@ impl Default for TemplateApp {
             label: "Hello World!".to_owned(),
             books: vec![],
             search_button_clicked: false,
-            rt: Runtime::new().expect("Error creating runtime")
+            rt: Runtime::new().expect("Error creating runtime"),
         }
     }
 }
@@ -86,7 +89,9 @@ impl eframe::App for TemplateApp {
                 
                 ui.add(Spinner::new());
                 if self.search_button_clicked {
+
                     self.books = self.rt.block_on(async {
+                        
                         GoodreadsBook::search(self.label.as_str()).await});
                     
                     for book in &self.books {
