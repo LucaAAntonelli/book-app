@@ -83,8 +83,7 @@ impl eframe::App for TemplateApp {
             // Search box for book queries
             ui.horizontal(|ui| { 
                 ui.label("Enter Query: ");
-                ui.text_edit_singleline(&mut self.label);
-                if ui.button("Enter").clicked() {
+                if ui.text_edit_singleline(&mut self.label).lost_focus() || ui.button("Search").clicked() {
                     // Permanently set self.search_button_clicked to true, keeps spinner active
                     self.search_button_clicked = true;
                     self.search_in_progress = true;
