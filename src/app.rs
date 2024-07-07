@@ -121,28 +121,28 @@ impl eframe::App for TemplateApp {
 
 fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
     TableBuilder::new(ui)
-            .columns(Column::auto().resizable(true), 5)
-            .header(20.0, |mut header| {
-                header.col(|ui| {
-                    ui.strong("Title");
-                });
-                header.col(|ui| {
-                    ui.strong("Author(s)");
-                });
-                header.col(|ui| {
-                    ui.strong("No. Pages");
-                });
-                header.col(|ui| {
-                    ui.strong("Series");
-                });
-                header.col(|ui| {
-                    ui.strong("Volume");
-                });
-            })
-            .body(|mut body| {
-
-                for book in books {
-                    body.row(20.0, |mut row| {
+        .columns(Column::auto().resizable(true), 5)
+        .sense(egui::Sense::click())
+        .header(20.0, |mut header| {
+            header.col(|ui| {
+                ui.strong("Title");
+            });
+            header.col(|ui| {
+                ui.strong("Author(s)");
+            });
+            header.col(|ui| {
+                ui.strong("No. Pages");
+            });
+            header.col(|ui| {
+                ui.strong("Series");
+            });
+            header.col(|ui| {
+                ui.strong("Volume");
+            });
+        })
+        .body(|mut body| {
+            for book in books {
+                body.row(20.0, |mut row| {
                     row.col(|ui| {
                         ui.label(book.title());
                     });
@@ -153,15 +153,18 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
                         ui.label(book.pages().to_string());
                     });
                     row.col(|ui| {
-                        ui.label(book.series().unwrap_or("None".to_string()));
+                        ui.label(book.series().unwrap_or_else(|| "None".to_string()));
                     });
                     row.col(|ui| {
-                        ui.label({match book.index() {
+                        ui.label(match book.index() {
                             None => "None".to_string(),
-                            Some(f) => f.to_string()
-                        }});
+                            Some(f) => f.to_string(),
+                        });
                     });
-                });}
-            });
+                    if row.response().clicked() {
+                        println!("{}", book);
+                    }
+                });
+            }
+        });
 }
-
