@@ -97,7 +97,7 @@ impl eframe::App for TemplateApp {
                 let handle = self.rt.handle().clone();
                 let label = self.label.clone();
                 if self.search_button_clicked {
-                    
+                    self.books.lock().unwrap().clear(); 
                     handle.spawn(async move {
                         let res = GoodreadsBook::search(label.as_str()).await;
                         let mut result = result_clone.lock().unwrap();
