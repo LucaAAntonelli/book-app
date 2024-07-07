@@ -1,10 +1,9 @@
 use std::sync::{Arc, Mutex};
 
-use egui::{Spinner, Ui};
+use egui::Ui;
 use egui_extras::{Column, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
-use tokio::runtime::{Handle, Runtime};
-use tokio::sync::mpsc;
+use tokio::runtime::Runtime;
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
