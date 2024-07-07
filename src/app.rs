@@ -12,11 +12,13 @@ pub struct TemplateApp {
     // Example stuff:
     label: String,
     #[serde(skip)]
-    books: Vec<GoodreadsBook>,
+    books: Arc<Mutex<Vec<GoodreadsBook>>>,
     #[serde(skip)]
     search_button_clicked: bool,
     #[serde(skip)]
     rt: tokio::runtime::Runtime,
+    #[serde(skip)]
+    search_in_progress: bool,
 }
 
 impl Default for TemplateApp {
@@ -24,9 +26,10 @@ impl Default for TemplateApp {
         Self {
             // Example stuff:
             label: "Hello World!".to_owned(),
-            books: vec![],
+            books: Arc::new(Mutex::new(vec![])),
             search_button_clicked: false,
             rt: Runtime::new().expect("Error creating runtime"),
+            search_in_progress: false,
         }
     }
 }
@@ -81,30 +84,41 @@ impl eframe::App for TemplateApp {
             ui.horizontal(|ui| { 
                 ui.label("Enter Query: ");
                 ui.text_edit_singleline(&mut self.label);
-                self.search_button_clicked = ui.button("Enter").clicked();
+                if ui.button("Enter").clicked() {
+                    // Permanently set self.search_button_clicked to true, keeps spinner active
+                    self.search_button_clicked = true;
+                    self.search_in_progress = true;
+                }
                 
             });
 
             ui.vertical(|ui| {
-                
-                ui.add(Spinner::new());
+                let result_clone = Arc::clone(&self.books);
+                let handle = self.rt.handle().clone();
+                let label = self.label.clone();
                 if self.search_button_clicked {
-
-                    self.books = self.rt.block_on(async {
-                        
-                        GoodreadsBook::search(self.label.as_str()).await});
                     
-                    for book in &self.books {
-                        println!("{book}");
-                    }
+                    handle.spawn(async move {
+                        let res = GoodreadsBook::search(label.as_str()).await;
+                        let mut result = result_clone.lock().unwrap();
+                        *result = res;
+                    });
+                    self.search_button_clicked = false;
                 }
-                if !self.books.is_empty() {
-                    table_ui(ui, self.books.clone());
+                if self.search_in_progress {
+                    // Still waiting on async task to finish
+                    ui.spinner();
+                } 
+                if !self.books.lock().unwrap().is_empty() {
+                    table_ui(ui, self.books.lock().unwrap().clone());
+                    self.search_in_progress = false;
                 }
             });
     });
 }
 }
+
+
 
 fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
     TableBuilder::new(ui)
@@ -151,3 +165,4 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
                 });}
             });
 }
+
