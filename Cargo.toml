@@ -19,8 +19,8 @@ chrono = { version = "0.4.31" }
 reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.107"
-egui = "0.27.0"
-eframe = { version = "0.27.0", default-features = false, features = [
+egui = "0.28.1"
+eframe = { version = "0.28.1", default-features = false, features = [
     "accesskit",
     "default_fonts",
     "glow",
@@ -29,10 +29,9 @@ eframe = { version = "0.27.0", default-features = false, features = [
 log = "0.4"
 calamine = "0.23"
 
-egui_extras = { version = "0.27.0", features = ["datepicker", "all_loaders"] }
-
+egui_extras = { version = "0.28.1", features = ["datepicker", "all_loaders"] }
+image = { version = "0.25.1", features = ["jpeg", "png"]}
 env_logger = "0.10"
-ehttp = "0.3.1"
 poll-promise = "0.3.0"
 egui_demo_lib = "0.23.0"
 glutin = "0.31.2"

@@ -26,7 +26,7 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "Book Tracker", 
         native_options, 
-        Box::new(|cc| Box::new(book_app::TemplateApp::new(cc))),
+        Box::new(|cc| Ok(Box::new(book_app::TemplateApp::new(cc)))),
     )
 
 }

@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use egui::Ui;
+use egui::{Image, Ui};
 use egui_extras::{Column, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
 use tokio::runtime::Runtime;
@@ -59,6 +59,9 @@ impl eframe::App for TemplateApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
         // For inspiration and more examples, go to https://emilk.github.io/egui
+
+        // Load image loaders
+        egui_extras::install_image_loaders(ctx);
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
@@ -127,9 +130,13 @@ impl eframe::App for TemplateApp {
 
 fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
     TableBuilder::new(ui)
-        .columns(Column::auto().resizable(true), 5)
+        .columns(Column::auto().resizable(true), 6)
         .sense(egui::Sense::click()) // Add sensing capabilities for each row in the table
         .header(20.0, |mut header| {
+            header.col(|ui| {
+                ui.strong("Cover");
+            });
+            
             header.col(|ui| {
                 ui.strong("Title");
             });
@@ -150,6 +157,12 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
             // Iterate over book vector, add row for each
             for book in books {
                 body.row(20.0, |mut row| {
+                    row.col(|ui| {
+                       ui.image(
+                        // "https://www.pngall.com/wp-content/uploads/8/Sample-PNG-Image.png"
+                        book.cover_image().expect("No cover URL found")
+                    );
+                    });
                     row.col(|ui| {
                         ui.label(book.title());
                     });
