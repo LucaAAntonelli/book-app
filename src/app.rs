@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use egui::{Image, Ui};
+use egui::{Image, Ui, Widget};
 use egui_extras::{Column, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
 use tokio::runtime::Runtime;
@@ -158,10 +158,10 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
             for book in books {
                 body.row(20.0, |mut row| {
                     row.col(|ui| {
-                       ui.image(
-                        // "https://www.pngall.com/wp-content/uploads/8/Sample-PNG-Image.png"
-                        book.cover_image().expect("No cover URL found")
-                    );
+                        egui::widgets::Image::new(book.cover_image().expect("No URL found"))
+                            .fit_to_original_size(1 as f32)
+                            .ui(ui);
+                       //ui.image(book.cover_image().expect("No cover URL found"));
                     });
                     row.col(|ui| {
                         ui.label(book.title());
