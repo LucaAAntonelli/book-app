@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use egui::{Image, Ui, Widget};
+use egui::{Ui, Widget};
 use egui_extras::{Column, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
 use tokio::runtime::Runtime;
@@ -136,7 +136,6 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
             header.col(|ui| {
                 ui.strong("Cover");
             });
-            
             header.col(|ui| {
                 ui.strong("Title");
             });
