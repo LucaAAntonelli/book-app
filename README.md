@@ -9,3 +9,7 @@ A personal application that combines my love for books with my passion for Rust 
   - [ ] Update progress
   - [ ] View data about reading progress
 
+# Screenshots
+
+Sample search results from the query "the hobbit".
+![Search results](assets/image.png)

@@ -130,7 +130,7 @@ impl eframe::App for TemplateApp {
 
 fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
     TableBuilder::new(ui)
-        .columns(Column::auto().resizable(true), 6)
+        .columns(Column::auto().resizable(true).at_least(40.0).at_most(70.0), 6)
         .sense(egui::Sense::click()) // Add sensing capabilities for each row in the table
         .header(20.0, |mut header| {
             header.col(|ui| {
@@ -156,12 +156,12 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
         .body(|mut body| {
             // Iterate over book vector, add row for each
             for book in books {
-                body.row(20.0, |mut row| {
+                body.row(50.0, |mut row| {
                     row.col(|ui| {
                         egui::widgets::Image::new(book.cover_image().expect("No URL found"))
                             .fit_to_original_size(1 as f32)
+                            .max_width(40.0)
                             .ui(ui);
-                       //ui.image(book.cover_image().expect("No cover URL found"));
                     });
                     row.col(|ui| {
                         ui.label(book.title());
