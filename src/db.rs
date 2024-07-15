@@ -22,7 +22,7 @@ impl Book {
         let pages = book.pages();
         
         println!("The book is {} by {:?}, bought on {}. It has {} pages", title, authors, date, &pages);
-        Self {title: title.to_string(), authors: authors.to_vec(), pages, acquisition_date: date, start_date: Option::None, end_date: Option::None, price_ebook: Option::None, price_paperback: Option::None}
+        Self {title: title.to_string(), authors: authors.to_vec(), pages, acquisition_date: Some(date), start_date: Option::None, end_date: Option::None, price_ebook: Option::None, price_paperback: Option::None}
     }
 }
 
