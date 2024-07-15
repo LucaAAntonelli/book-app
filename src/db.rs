@@ -26,6 +26,21 @@ impl Book {
     }
 }
 
+impl From<goodreads_api::GoodreadsBook> for Book {
+    fn from(value: goodreads_api::GoodreadsBook) -> Self {
+        Self {
+            title: value.title(),
+            authors: value.authors(),
+            pages: value.pages(),
+            acquisition_date: NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
+            start_date: None,
+            end_date: None,
+            price_ebook: None,
+            price_paperback: None
+        }
+    }
+}
+
 pub struct DataBaseConnection {
     database_url: String,
     pool: Pool<sqlx::Postgres>,

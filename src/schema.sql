@@ -4,7 +4,7 @@ CREATE TABLE owned_books (
     book_id SERIAL PRIMARY KEY,
     title VARCHAR(63) UNIQUE NOT NULL,
     num_pages INTEGER NOT NULL,
-    acquisition_date DATE NOT NULL,
+    acquisition_date DATE,
     price_ebook DECIMAL(5,2),
     price_paperback DECIMAL(5,2),
     CONSTRAINT no_negative_prices CHECK (price_ebook >= 0 AND price_paperback >= 0)
