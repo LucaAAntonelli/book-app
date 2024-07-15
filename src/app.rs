@@ -97,51 +97,63 @@ impl eframe::App for TemplateApp {
             });
         });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            // The central panel the region left after adding TopPanel's and SidePanel's
-            ui.heading("Book Tracker");
+        match self.current_panel {
+            Panels::QueryGoodreads => {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                // The central panel the region left after adding TopPanel's and SidePanel's
+                ui.heading("Book Tracker");
 
-            // Search box for book queries
-            ui.horizontal(|ui| { 
-                ui.label("Enter Query: ");
-                if ui.text_edit_singleline(&mut self.label).lost_focus() || ui.button("Search").clicked() {
-                    // Permanently set self.search_button_clicked to true, keeps spinner active
-                    self.search_button_clicked = true;
-                    self.search_in_progress = true;
-                }
+                // Search box for book queries
+                ui.horizontal(|ui| { 
+                    ui.label("Enter Query: ");
+                    if ui.text_edit_singleline(&mut self.label).lost_focus() || ui.button("Search").clicked() {
+                        // Permanently set self.search_button_clicked to true, keeps spinner active
+                        self.search_button_clicked = true;
+                        self.search_in_progress = true;
+                    }
+                    
+                });
+
+                // Table displaying query results
+                ui.vertical(|ui| {
+                    let result_clone = Arc::clone(&self.books);
+                    let handle = self.rt.handle().clone();
+                    let label = self.label.clone();
+                    if self.search_button_clicked {
+                        // Empty out books vector -> Ensures spinner display after consecutive querying
+                        self.books.lock().unwrap().clear(); 
+                        // Spawn tokio asynchronous task handler to call Goodreads API without blocking the main thread
+                        handle.spawn(async move {
+                            let res = GoodreadsBook::search(label.as_str()).await;
+                            let mut result = result_clone.lock().unwrap();
+                            *result = res;
+                        });
+                        // Reset search button state
+                        self.search_button_clicked = false;
+                    }
+                    // Display a spinner while the API call is awaited
+                    if self.search_in_progress {
+                        // Still waiting on async task to finish
+                        ui.spinner();
+                    }
+                    // Once the vector is filled and unlocked, display it in a table
+                    if !self.books.lock().unwrap().is_empty() {
+                        table_ui(ui, self.books.lock().unwrap().clone());
+                        self.search_in_progress = false;
+                    }
+                });
+            });
+            },
+            Panels::UpdateDatabase => {
+
+            },
+            Panels::VisualizeData => {
                 
-            });
+            }
+        }
 
-            // Table displaying query results
-            ui.vertical(|ui| {
-                let result_clone = Arc::clone(&self.books);
-                let handle = self.rt.handle().clone();
-                let label = self.label.clone();
-                if self.search_button_clicked {
-                    // Empty out books vector -> Ensures spinner display after consecutive querying
-                    self.books.lock().unwrap().clear(); 
-                    // Spawn tokio asynchronous task handler to call Goodreads API without blocking the main thread
-                    handle.spawn(async move {
-                        let res = GoodreadsBook::search(label.as_str()).await;
-                        let mut result = result_clone.lock().unwrap();
-                        *result = res;
-                    });
-                    // Reset search button state
-                    self.search_button_clicked = false;
-                }
-                // Display a spinner while the API call is awaited
-                if self.search_in_progress {
-                    // Still waiting on async task to finish
-                    ui.spinner();
-                }
-                // Once the vector is filled and unlocked, display it in a table
-                if !self.books.lock().unwrap().is_empty() {
-                    table_ui(ui, self.books.lock().unwrap().clone());
-                    self.search_in_progress = false;
-                }
-            });
-    });
-}
+        
+    }
 }
 
 
