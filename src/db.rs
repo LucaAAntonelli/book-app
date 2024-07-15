@@ -1,4 +1,5 @@
 use chrono::NaiveDate;
+use ::goodreads_api::goodreads_api::GoodreadsBook;
 use sqlx::types::BigDecimal;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Pool;
@@ -20,8 +21,7 @@ impl Book {
         let title = book.title();
         let authors = book.authors();
         let pages = book.pages();
-        
-        println!("The book is {} by {:?}, bought on {}. It has {} pages", title, authors, date, &pages);
+
         Self {title: title.to_string(), authors: authors.to_vec(), pages, acquisition_date: Some(date), start_date: Option::None, end_date: Option::None, price_ebook: Option::None, price_paperback: Option::None}
     }
 }
@@ -56,8 +56,8 @@ impl DataBaseConnection {
         Ok(database)
     }
 
-    pub async fn insert_owned_book(&self, book: Book) -> Result<(), sqlx::Error> {
-        
+    pub async fn insert_owned_book(&self, input_book: GoodreadsBook) -> Result<(), sqlx::Error> {
+        let book = Book::from(input_book);
         sqlx::query!(
             "INSERT INTO owned_books (title, num_pages, acquisition_date) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
             book.title,

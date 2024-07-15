@@ -1,12 +1,26 @@
-use std::sync::{Arc, Mutex};
+use std::{env, sync::{Arc, Mutex}};
 
+use dotenv::dotenv;
 use egui::{Ui, Widget};
 use egui_extras::{Column, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
 use tokio::runtime::Runtime;
+
+use crate::db::{self, DataBaseConnection};
+
+#[derive(PartialEq)]
+enum Panels {
+    QueryGoodreads,
+    UpdateDatabase,
+    VisualizeData
+}
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
+
+
+
 pub struct TemplateApp {
     // Example stuff:
     label: String, // search box label
@@ -18,10 +32,18 @@ pub struct TemplateApp {
     rt: tokio::runtime::Runtime,
     #[serde(skip)]
     search_in_progress: bool,
+    #[serde(skip)]
+    current_panel: Panels,
+    #[serde(skip)]
+    database_connection: db::DataBaseConnection,
 }
 
 impl Default for TemplateApp {
     fn default() -> Self {
+        dotenv().ok();
+        let db_uri = env::var("DATABASE_URL").expect("DATABASE_URL must be set!");
+        let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
+        let database_connection = rt.block_on(async { DataBaseConnection::new(&db_uri).await.unwrap() });
         Self {
             // Example stuff:
             label: "Hello World!".to_owned(),
@@ -29,6 +51,8 @@ impl Default for TemplateApp {
             search_button_clicked: false,
             rt: Runtime::new().expect("Error creating runtime"),
             search_in_progress: false,
+            current_panel: Panels::QueryGoodreads,
+            database_connection,
         }
     }
 }
@@ -66,16 +90,10 @@ impl eframe::App for TemplateApp {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
 
-            egui::menu::bar(ui, |ui| {
-                
-                ui.menu_button("File", |ui| {
-                    if ui.button("Quit").clicked() {
-                        ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                    }
-                });
-            
-
-                
+            ui.horizontal(|ui| {
+                ui.selectable_value(&mut self.current_panel, Panels::QueryGoodreads, "Query Goodreads");
+                ui.selectable_value(&mut self.current_panel, Panels::UpdateDatabase, "Update Database");
+                ui.selectable_value(&mut self.current_panel, Panels::VisualizeData, "Visualize Data");
             });
         });
 
@@ -183,6 +201,7 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
                     // For now, simply print selected book based on which column is clicked
                     if row.response().clicked() {
                         println!("{}", book);
+
                     }
                 });
             }
