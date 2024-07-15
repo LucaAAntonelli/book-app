@@ -49,7 +49,7 @@ impl Default for TemplateApp {
             label: "Hello World!".to_owned(),
             books: Arc::new(Mutex::new(vec![])),
             search_button_clicked: false,
-            rt: Runtime::new().expect("Error creating runtime"),
+            rt, 
             search_in_progress: false,
             current_panel: Panels::QueryGoodreads,
             database_connection,
@@ -138,7 +138,7 @@ impl eframe::App for TemplateApp {
                     }
                     // Once the vector is filled and unlocked, display it in a table
                     if !self.books.lock().unwrap().is_empty() {
-                        table_ui(ui, self.books.lock().unwrap().clone());
+                        table_ui(self.database_connection.clone(), ui, self.books.lock().unwrap().clone());
                         self.search_in_progress = false;
                     }
                 });
@@ -148,7 +148,7 @@ impl eframe::App for TemplateApp {
 
             },
             Panels::VisualizeData => {
-                
+
             }
         }
 
@@ -158,7 +158,7 @@ impl eframe::App for TemplateApp {
 
 
 
-fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
+fn table_ui(db_connection: DataBaseConnection, ui: &mut Ui, books: Vec<GoodreadsBook>) {
     TableBuilder::new(ui)
         .columns(Column::auto().resizable(true).at_least(40.0).at_most(70.0), 6)
         .sense(egui::Sense::click()) // Add sensing capabilities for each row in the table
@@ -213,6 +213,8 @@ fn table_ui(ui: &mut Ui, books: Vec<GoodreadsBook>) {
                     // For now, simply print selected book based on which column is clicked
                     if row.response().clicked() {
                         println!("{}", book);
+                        //tokio::spawn(async {db_connection.insert_owned_book(book).await});
+                        
 
                     }
                 });

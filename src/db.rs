@@ -41,6 +41,7 @@ impl From<goodreads_api::GoodreadsBook> for Book {
     }
 }
 
+#[derive(Clone)]
 pub struct DataBaseConnection {
     database_url: String,
     pool: Pool<sqlx::Postgres>,
