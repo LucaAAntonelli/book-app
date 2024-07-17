@@ -26,6 +26,11 @@ impl Book {
     }
 }
 
+fn assert_send<T: Send>() {}
+pub fn assert_send_book() {
+    assert_send::<Book>();
+}
+
 impl From<goodreads_api::GoodreadsBook> for Book {
     fn from(value: goodreads_api::GoodreadsBook) -> Self {
         Self {
@@ -41,20 +46,16 @@ impl From<goodreads_api::GoodreadsBook> for Book {
     }
 }
 
-#[derive(Clone)]
-pub struct DataBaseConnection {
-    database_url: String,
-    pool: Pool<sqlx::Postgres>,
-}
+
+pub struct DataBaseConnection(Pool<sqlx::Postgres>);
+
 
 impl DataBaseConnection {
 
     pub async fn new(database_url: &str) -> Result<Self, sqlx::Error> {
         
         let pool = PgPoolOptions::new().max_connections(5).connect(database_url).await.unwrap();
-        let database = Self {database_url: database_url.to_owned(), pool};
-        
-        Ok(database)
+        Ok(DataBaseConnection(pool))
     }
 
     pub async fn insert_owned_book(&self, input_book: GoodreadsBook) -> Result<(), sqlx::Error> {
@@ -64,16 +65,16 @@ impl DataBaseConnection {
             book.title,
             book.pages as i32,
             book.acquisition_date
-        ).execute(&self.pool).await?;
+        ).execute(&self.0).await?;
     
         for author in &book.authors {
             sqlx::query!(
                 "INSERT INTO authors (name) VALUES ($1) ON CONFLICT (name) DO NOTHING",
                 author.to_owned()
             )
-            .execute(&self.pool)
+            .execute(&self.0)
             .await?;
-            sqlx::query!("INSERT INTO book_authors (book_id, author_id) VALUES ((SELECT book_id FROM owned_books WHERE title = $1), (SELECT author_id FROM authors WHERE name = $2)) ON CONFLICT DO NOTHING", book.title, author).execute(&self.pool).await?;
+            sqlx::query!("INSERT INTO book_authors (book_id, author_id) VALUES ((SELECT book_id FROM owned_books WHERE title = $1), (SELECT author_id FROM authors WHERE name = $2)) ON CONFLICT DO NOTHING", book.title, author).execute(&self.0).await?;
         }
     
         Ok(())
@@ -81,7 +82,7 @@ impl DataBaseConnection {
 
     pub async fn start_new_book(&self, book_id: i32, start_date: NaiveDate) -> Result<(), sqlx::Error> {
         sqlx::query!("INSERT INTO read_books (book_id, start_date) VALUES ($1, $2)", book_id, start_date)
-        .execute(&self.pool)
+        .execute(&self.0)
         .await?;
     
         Ok(())
@@ -89,7 +90,7 @@ impl DataBaseConnection {
 
     pub async fn finished_book(&self, book_id: i32, end_date: NaiveDate) -> Result<(), sqlx::Error> {
         sqlx::query!("UPDATE read_books SET end_date = $1 WHERE book_id = $2", end_date, book_id)
-        .execute(&self.pool)
+        .execute(&self.0)
         .await?;
     
         Ok(())
@@ -97,7 +98,7 @@ impl DataBaseConnection {
 
     pub async fn all_authors(&self) -> Result<(), sqlx::Error> {
         let query_result = sqlx::query!("SELECT * FROM authors")
-            .fetch_all(&self.pool)
+            .fetch_all(&self.0)
             .await?;
         for row in query_result {
             println!("{:?}", row);
@@ -108,7 +109,7 @@ impl DataBaseConnection {
 
     pub async fn alter_start_date(&self, book_id: i32, start_date: NaiveDate) -> Result<(), sqlx::Error> {
         sqlx::query!("UPDATE read_books SET start_date = $1 WHERE book_id = $2", start_date, book_id)
-        .execute(&self.pool)
+        .execute(&self.0)
         .await?;
     
         Ok(())
@@ -116,7 +117,7 @@ impl DataBaseConnection {
     
     pub async fn alter_end_date(&self, book_id: i32, end_date: NaiveDate) -> Result<(), sqlx::Error> {
         sqlx::query!("UPDATE read_books SET end_date = $1 WHERE book_id = $2", end_date, book_id)
-        .execute(&self.pool)
+        .execute(&self.0)
         .await?;
     
         Ok(())
