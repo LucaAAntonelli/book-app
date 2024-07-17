@@ -24,28 +24,7 @@ pub struct TemplateApp {
     search_in_progress: bool,
     current_panel: Panels,
     database_connection: Arc<Mutex<db::DataBaseConnection>>,
-}
-
-impl Default for TemplateApp {
-    fn default() -> Self {
-        dotenv().ok();
-        info!("Loading database URI from .env");
-        let db_uri = env::var("DATABASE_URL").expect("DATABASE_URL must be set!");
-        info!("Successfully loaded URI");
-        let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
-        let database_connection = rt.block_on(async { DataBaseConnection::new(&db_uri).await.unwrap() });
-        info!("Connected to database");
-        Self {
-            // Example stuff:
-            label: "".to_owned(),
-            books: Arc::new(std::sync::Mutex::new(vec![])),
-            search_button_clicked: false,
-            rt, 
-            search_in_progress: false,
-            current_panel: Panels::QueryGoodreads,
-            database_connection: Arc::new(Mutex::new(database_connection)),
-        }
-    }
+    file_dialog: egui_file_dialog::FileDialog,
 }
 
 impl TemplateApp {
@@ -71,6 +50,7 @@ impl TemplateApp {
             search_in_progress: false,
             current_panel: Panels::QueryGoodreads,
             database_connection: Arc::new(Mutex::new(database_connection)),
+            file_dialog: egui_file_dialog::FileDialog::new(),
         }
     }
 }
@@ -103,13 +83,25 @@ impl eframe::App for TemplateApp {
                 // Search box for book queries
                 ui.horizontal(|ui| { 
                     ui.label("Enter Query: ");
-                    if ui.text_edit_singleline(&mut self.label).lost_focus() || ui.button("Search").clicked() {
-                        // Permanently set self.search_button_clicked to true, keeps spinner active
-                        info!("Detected search button click");
-                        self.search_button_clicked = true;
-                        self.search_in_progress = true;
-                    }
+                    ui.vertical(|ui| {
+                        if ui.text_edit_singleline(&mut self.label).lost_focus() || ui.button("Search").clicked() {
+                            // Permanently set self.search_button_clicked to true, keeps spinner active
+                            info!("Detected search button click");
+                            self.search_button_clicked = true;
+                            self.search_in_progress = true;
+                        }
+                        if ui.button("Import from Excel").clicked() {
+                            info!("Opening file dialog");
+                            self.file_dialog.select_file();
+
+                        }
+                    });
                     
+                if let Some(path) = self.file_dialog.update(ctx).selected() {
+                    info!("File dialog selected a file");
+                    println!("{}", path.to_str().unwrap());
+                }
+                 
                 });
 
                 // Table displaying query results
