@@ -4,7 +4,7 @@ use sqlx::types::BigDecimal;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Pool;
 use goodreads_api::goodreads_api;
-use log::{info, warn, error};
+use log::info;
 pub struct Book {
     title: String,
     authors: Vec<String>,

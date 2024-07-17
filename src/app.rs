@@ -3,7 +3,7 @@ use dotenv::dotenv;
 use egui::{Ui, Widget};
 use egui_extras::{Column, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
-use log::{info, warn, error};
+use log::{info, error};
 use tokio::sync::Mutex;
 use crate::db::{self, DataBaseConnection};
 
