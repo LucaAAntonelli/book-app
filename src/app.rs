@@ -44,7 +44,7 @@ impl Default for TemplateApp {
         info!("Loading database URI from .env");
         let db_uri = env::var("DATABASE_URL").expect("DATABASE_URL must be set!");
         info!("Successfully loaded URI: {db_uri}");
-        let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
+        let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
         //let database_connection = rt.block_on(async { DataBaseConnection::new(&db_uri).await.unwrap() });
         info!("Connected to database");
         Self {
