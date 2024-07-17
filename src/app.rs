@@ -14,26 +14,15 @@ enum Panels {
     VisualizeData
 }
 
-/// We derive Deserialize/Serialize so we can persist app state on shutdown.
-#[derive(serde::Deserialize, serde::Serialize)]
-#[serde(default)] // if we add new fields, give them default values when deserializing old state
-
-
 
 pub struct TemplateApp {
     // Example stuff:
     label: String, // search box label
-    #[serde(skip)]
     books: Arc<std::sync::Mutex<Vec<GoodreadsBook>>>, // field to allow asynchronous call to Goodreads API
-    #[serde(skip)]
     search_button_clicked: bool, 
-    #[serde(skip)]
     rt: tokio::runtime::Runtime,
-    #[serde(skip)]
     search_in_progress: bool,
-    #[serde(skip)]
     current_panel: Panels,
-    #[serde(skip)]
     database_connection: Arc<Mutex<db::DataBaseConnection>>,
 }
 
@@ -48,7 +37,7 @@ impl Default for TemplateApp {
         info!("Connected to database");
         Self {
             // Example stuff:
-            label: "Hello World!".to_owned(),
+            label: "".to_owned(),
             books: Arc::new(std::sync::Mutex::new(vec![])),
             search_button_clicked: false,
             rt, 
@@ -67,19 +56,35 @@ impl TemplateApp {
 
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
-        if let Some(storage) = cc.storage {
-            return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
-        }
+        //if let Some(storage) = cc.storage {
+        //    return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
+        //}
 
-        Default::default()
+        dotenv().ok();
+        info!("Loading database URI from .env");
+        let db_uri = env::var("DATABASE_URL").expect("DATABASE_URL must be set!");
+        info!("Successfully loaded URI");
+        let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
+        let database_connection = rt.block_on(async { DataBaseConnection::new(&db_uri).await.unwrap() });
+        info!("Connected to database");
+        Self {
+            // Example stuff:
+            label: "".to_owned(),
+            books: Arc::new(std::sync::Mutex::new(vec![])),
+            search_button_clicked: false,
+            rt, 
+            search_in_progress: false,
+            current_panel: Panels::QueryGoodreads,
+            database_connection: Arc::new(Mutex::new(database_connection)),
+        }
     }
 }
 
 impl eframe::App for TemplateApp {
     /// Called by the frame work to save state before shutdown.
-    fn save(&mut self, storage: &mut dyn eframe::Storage) {
-        eframe::set_value(storage, eframe::APP_KEY, self);
-    }
+    //fn save(&mut self, storage: &mut dyn eframe::Storage) {
+    //    eframe::set_value(storage, eframe::APP_KEY, self);
+    //}
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {

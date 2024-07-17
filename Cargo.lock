@@ -1232,7 +1232,6 @@ checksum = "6490ef800b2e41ee129b1f32f9ac15f713233fe3bc18e241a1afe1e4fb6811e0"
 dependencies = [
  "ahash",
  "bytemuck",
- "directories",
  "document-features",
  "egui",
  "egui-winit",
@@ -1250,8 +1249,6 @@ dependencies = [
  "percent-encoding",
  "raw-window-handle 0.5.2",
  "raw-window-handle 0.6.2",
- "ron",
- "serde",
  "static_assertions",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -1279,7 +1276,6 @@ dependencies = [
  "epaint",
  "log",
  "nohash-hasher",
- "ron",
  "serde",
 ]
 
@@ -1307,7 +1303,6 @@ dependencies = [
  "egui",
  "log",
  "raw-window-handle 0.6.2",
- "serde",
  "smithay-clipboard",
  "web-time",
  "webbrowser",
@@ -3791,18 +3786,6 @@ dependencies = [
  "spin 0.9.8",
  "untrusted",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "ron"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b91f7eff05f748767f183df4320a63d6936e9c6107d97c9e6bdd9784f4289c94"
-dependencies = [
- "base64 0.21.7",
- "bitflags 2.6.0",
- "serde",
- "serde_derive",
 ]
 
 [[package]]

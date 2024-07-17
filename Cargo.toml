@@ -23,7 +23,6 @@ eframe = { version = "0.28.1", default-features = false, features = [
     "accesskit",
     "default_fonts",
     "glow",
-    "persistence",
 ] }
 log = "0.4"
 
