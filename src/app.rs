@@ -54,11 +54,6 @@ impl TemplateApp {
         // This is also where you can customize the look and feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
 
-        // Load previous app state (if any).
-        // Note that you must enable the `persistence` feature for this to work.
-        //if let Some(storage) = cc.storage {
-        //    return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
-        //}
 
         dotenv().ok();
         info!("Loading database URI from .env");
@@ -81,11 +76,6 @@ impl TemplateApp {
 }
 
 impl eframe::App for TemplateApp {
-    /// Called by the frame work to save state before shutdown.
-    //fn save(&mut self, storage: &mut dyn eframe::Storage) {
-    //    eframe::set_value(storage, eframe::APP_KEY, self);
-    //}
-
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
