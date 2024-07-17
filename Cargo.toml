@@ -16,7 +16,6 @@ dotenv = "0.15.0"
 sqlx = { version = "0.7.2", features = ["postgres", "runtime-tokio", "macros", "chrono", "bigdecimal"] }
 tokio = { version = "1.34", features = ["full"] }
 chrono = { version = "0.4.31" }
-reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.107"
 egui = "0.28.1"
