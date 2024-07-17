@@ -27,7 +27,7 @@ eframe = { version = "0.28.1", default-features = false, features = [
     "persistence",
 ] }
 log = "0.4"
-calamine = "0.23"
+# calamine = "0.23"
 
 egui_extras = { version = "0.28.1", features = ["datepicker", "all_loaders"] }
 image = { version = "0.25.1", features = ["jpeg", "png"]}

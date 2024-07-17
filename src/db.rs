@@ -4,6 +4,7 @@ use sqlx::types::BigDecimal;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::Pool;
 use goodreads_api::goodreads_api;
+use log::{info, warn, error};
 pub struct Book {
     title: String,
     authors: Vec<String>,
@@ -28,6 +29,7 @@ impl Book {
 
 fn assert_send<T: Send>() {}
 pub fn assert_send_book() {
+    info!("Asserting the Book struct implements Send");
     assert_send::<Book>();
 }
 
@@ -53,12 +55,14 @@ pub struct DataBaseConnection(Pool<sqlx::Postgres>);
 impl DataBaseConnection {
 
     pub async fn new(database_url: &str) -> Result<Self, sqlx::Error> {
-        
+        info!("Creating new SQL database connection pool");
         let pool = PgPoolOptions::new().max_connections(5).connect(database_url).await.unwrap();
+        info!("Successfully created SQL database connection pool");
         Ok(DataBaseConnection(pool))
     }
 
     pub async fn insert_owned_book(&self, input_book: GoodreadsBook) -> Result<(), sqlx::Error> {
+        info!("Inserting new book into database");
         let book = Book::from(input_book);
         sqlx::query!(
             "INSERT INTO owned_books (title, num_pages, acquisition_date) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
@@ -66,6 +70,7 @@ impl DataBaseConnection {
             book.pages as i32,
             book.acquisition_date
         ).execute(&self.0).await?;
+        info!("Successfully inserted book");
     
         for author in &book.authors {
             sqlx::query!(
@@ -76,6 +81,7 @@ impl DataBaseConnection {
             .await?;
             sqlx::query!("INSERT INTO book_authors (book_id, author_id) VALUES ((SELECT book_id FROM owned_books WHERE title = $1), (SELECT author_id FROM authors WHERE name = $2)) ON CONFLICT DO NOTHING", book.title, author).execute(&self.0).await?;
         }
+        info!("Successfully inserted authors");
     
         Ok(())
     }
