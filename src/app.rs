@@ -1,7 +1,8 @@
 use std::{env, sync::Arc};
+use chrono::NaiveDate;
 use dotenv::dotenv;
 use egui::{Ui, Widget};
-use egui_extras::{Column, TableBuilder};
+use egui_extras::{Column, DatePickerButton, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
 use log::{info, error};
 use tokio::sync::Mutex;
@@ -130,7 +131,7 @@ impl eframe::App for TemplateApp {
                     }
                     // Once the vector is filled and unlocked, display it in a table
                     if !self.books.lock().unwrap().is_empty() {
-                        table_ui(&self.rt, Arc::clone(&self.database_connection), ui, self.books.lock().unwrap().clone());
+                        self.table_ui(ui);
                         self.search_in_progress = false;
                     }
                 });
@@ -149,74 +150,82 @@ impl eframe::App for TemplateApp {
 }
 
 
+impl TemplateApp {
 
-fn table_ui(rt: &tokio::runtime::Runtime, db_connection: Arc<tokio::sync::Mutex<db::DataBaseConnection>>, ui: &mut Ui, books: Vec<GoodreadsBook>) {
 
-    TableBuilder::new(ui)
-        .columns(Column::auto().resizable(true).at_least(40.0).at_most(70.0), 6)
-        .sense(egui::Sense::click()) // Add sensing capabilities for each row in the table
-        .header(20.0, |mut header| {
-            header.col(|ui| {
-                ui.strong("Cover");
-            });
-            header.col(|ui| {
-                ui.strong("Title");
-            });
-            header.col(|ui| {
-                ui.strong("Author(s)");
-            });
-            header.col(|ui| {
-                ui.strong("No. Pages");
-            });
-            header.col(|ui| {
-                ui.strong("Series");
-            });
-            header.col(|ui| {
-                ui.strong("Volume");
-            });
-        })
-        .body(|mut body| {
-            // Iterate over book vector, add row for each
-            for book in books {
-                body.row(50.0, |mut row| {
-                    row.col(|ui| {
-                        egui::widgets::Image::new(book.cover_image().expect("No URL found"))
-                            .fit_to_original_size(1 as f32)
-                            .max_width(40.0)
-                            .ui(ui);
-                    });
-                    row.col(|ui| {
-                        ui.label(book.title());
-                    });
-                    row.col(|ui| {
-                        ui.label(book.authors().join(",")); // For multiple authors, join them to single string
-                    });
-                    row.col(|ui| {
-                        ui.label(book.pages().to_string());
-                    });
-                    row.col(|ui| {
-                        ui.label(book.series().unwrap_or_else(|| "None".to_string()));
-                    });
-                    row.col(|ui| {
-                        ui.label(match book.index() {
-                            None => "None".to_string(),
-                            Some(f) => f.to_string(),
-                        });
-                    });
-                    // For now, simply print selected book based on which column is clicked
-                    if row.response().clicked() {
-                        info!("Book has been clicked, sending request to SQL database...");
-                        let db_connection_clone = Arc::clone(&db_connection);
-                        println!("{}", book);
-                        rt.spawn(async move {
-                            match db_connection_clone.lock().await.insert_owned_book(book).await {
-                                Ok(_) => info!("Query sent successfully"),
-                                Err(e) => error!("Could not send query: {e}")
-                            }
-                        });
-
-                    }
+    fn table_ui(&mut self, ui: &mut Ui) {
+        let books = self.books.lock().unwrap().clone();
+        TableBuilder::new(ui)
+            .columns(Column::auto().resizable(true).at_least(40.0).at_most(70.0), 6)
+            .sense(egui::Sense::click()) // Add sensing capabilities for each row in the table
+            .header(20.0, |mut header| {
+                header.col(|ui| {
+                    ui.strong("Cover");
                 });
-            }
-        });
+                header.col(|ui| {
+                    ui.strong("Title");
+                });
+                header.col(|ui| {
+                    ui.strong("Author(s)");
+                });
+                header.col(|ui| {
+                    ui.strong("No. Pages");
+                });
+                header.col(|ui| {
+                    ui.strong("Series");
+                });
+                header.col(|ui| {
+                    ui.strong("Volume");
+                });
+            })
+            .body(|mut body| {
+                // Iterate over book vector, add row for each
+                for book in books {
+                    body.row(50.0, |mut row| {
+                        row.col(|ui| {
+                            egui::widgets::Image::new(book.cover_image().expect("No URL found"))
+                                .fit_to_original_size(1 as f32)
+                                .max_width(40.0)
+                                .ui(ui);
+                        });
+                        row.col(|ui| {
+                            ui.label(book.title());
+                        });
+                        row.col(|ui| {
+                            ui.label(book.authors().join(", ")); // For multiple authors, join them to single string
+                        });
+                        row.col(|ui| {
+                            ui.label(book.pages().to_string());
+                        });
+                        row.col(|ui| {
+                            ui.label(book.series().unwrap_or_else(|| "None".to_string()));
+                        });
+                        row.col(|ui| {
+                            ui.label(match book.index() {
+                                None => "None".to_string(),
+                                Some(f) => f.to_string(),
+                            });
+                        });
+                        // For now, simply print selected book based on which column is clicked
+                        if row.response().clicked() {
+                            info!("Opening date picker widget");
+                            let mut selected_date = chrono::Utc::now().date_naive();
+                            // ui.add(DatePickerButton::new(&mut selected_date));
+                                                    
+                            info!("Book has been clicked, sending request to SQL database...");
+                            let db_connection_clone = Arc::clone(&self.database_connection);
+                            println!("{}", book);
+                            self.rt.spawn(async move {
+                                match db_connection_clone.lock().await.insert_owned_book(book).await {
+                                    Ok(_) => info!("Query sent successfully"),
+                                    Err(e) => error!("Could not send query: {e}")
+                                }
+                            });
+
+                        }
+                    });
+                }
+            });
+}
+
 }
