@@ -97,10 +97,10 @@ impl eframe::App for TemplateApp {
                         }
                     });
                     
-                if let Some(path) = self.file_dialog.update(ctx).selected() {
-                    info!("File dialog selected a file");
-                    println!("{}", path.to_str().unwrap());
-                }
+                    if let Some(path) = self.file_dialog.update(ctx).selected() {
+                        info!("File dialog selected a file");
+                        println!("{}", path.to_str().unwrap());
+                    }
                  
                 });
 
