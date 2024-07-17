@@ -685,7 +685,6 @@ dependencies = [
  "glutin",
  "goodreads-api",
  "image",
- "itertools 0.12.0",
  "log",
  "serde",
  "serde_json",

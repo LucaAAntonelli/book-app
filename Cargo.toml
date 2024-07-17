@@ -31,7 +31,6 @@ egui_extras = { version = "0.28.1", features = ["datepicker", "all_loaders"] }
 image = { version = "0.25.1", features = ["jpeg", "png"]}
 env_logger = "0.10"
 glutin = "0.31.2"
-itertools = "0.12.0"
 egui-file-dialog = "0.6.0"
 [profile.release]
 opt-level = 2 # fast and small wasm
