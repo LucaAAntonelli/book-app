@@ -27,11 +27,7 @@ impl Book {
     }
 }
 
-fn assert_send<T: Send>() {}
-pub fn assert_send_book() {
-    info!("Asserting the Book struct implements Send");
-    assert_send::<Book>();
-}
+
 
 impl From<goodreads_api::GoodreadsBook> for Book {
     fn from(value: goodreads_api::GoodreadsBook) -> Self {

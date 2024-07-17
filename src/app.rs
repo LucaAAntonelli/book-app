@@ -1,11 +1,10 @@
-use std::{env, sync::{Arc, Mutex}};
+use std::{env, sync::Arc};
 use dotenv::dotenv;
 use egui::{Ui, Widget};
 use egui_extras::{Column, TableBuilder};
 use ::goodreads_api::goodreads_api::GoodreadsBook;
-use tokio::runtime::Runtime;
 use log::{info, warn, error};
-
+use tokio::sync::Mutex;
 use crate::db::{self, DataBaseConnection};
 
 #[derive(PartialEq)]
@@ -25,7 +24,7 @@ pub struct TemplateApp {
     // Example stuff:
     label: String, // search box label
     #[serde(skip)]
-    books: Arc<Mutex<Vec<GoodreadsBook>>>, // field to allow asynchronous call to Goodreads API
+    books: Arc<std::sync::Mutex<Vec<GoodreadsBook>>>, // field to allow asynchronous call to Goodreads API
     #[serde(skip)]
     search_button_clicked: bool, 
     #[serde(skip)]
@@ -34,8 +33,8 @@ pub struct TemplateApp {
     search_in_progress: bool,
     #[serde(skip)]
     current_panel: Panels,
-    //#[serde(skip)]
-    //database_connection: Arc<Mutex<db::DataBaseConnection>>,
+    #[serde(skip)]
+    database_connection: Arc<Mutex<db::DataBaseConnection>>,
 }
 
 impl Default for TemplateApp {
@@ -43,19 +42,19 @@ impl Default for TemplateApp {
         dotenv().ok();
         info!("Loading database URI from .env");
         let db_uri = env::var("DATABASE_URL").expect("DATABASE_URL must be set!");
-        info!("Successfully loaded URI: {db_uri}");
+        info!("Successfully loaded URI");
         let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().unwrap();
-        //let database_connection = rt.block_on(async { DataBaseConnection::new(&db_uri).await.unwrap() });
+        let database_connection = rt.block_on(async { DataBaseConnection::new(&db_uri).await.unwrap() });
         info!("Connected to database");
         Self {
             // Example stuff:
             label: "Hello World!".to_owned(),
-            books: Arc::new(Mutex::new(vec![])),
+            books: Arc::new(std::sync::Mutex::new(vec![])),
             search_button_clicked: false,
             rt, 
             search_in_progress: false,
             current_panel: Panels::QueryGoodreads,
-           // database_connection: Arc::new(Mutex::new(database_connection)),
+            database_connection: Arc::new(Mutex::new(database_connection)),
         }
     }
 }
@@ -144,8 +143,7 @@ impl eframe::App for TemplateApp {
                     }
                     // Once the vector is filled and unlocked, display it in a table
                     if !self.books.lock().unwrap().is_empty() {
-                        info!("API call finished, rendering table...");
-                        table_ui(ui, self.books.lock().unwrap().clone());
+                        table_ui(&self.rt, Arc::clone(&self.database_connection), ui, self.books.lock().unwrap().clone());
                         self.search_in_progress = false;
                     }
                 });
@@ -165,7 +163,8 @@ impl eframe::App for TemplateApp {
 
 
 
-fn table_ui( ui: &mut Ui, books: Vec<GoodreadsBook>) {
+fn table_ui(rt: &tokio::runtime::Runtime, db_connection: Arc<tokio::sync::Mutex<db::DataBaseConnection>>, ui: &mut Ui, books: Vec<GoodreadsBook>) {
+
     TableBuilder::new(ui)
         .columns(Column::auto().resizable(true).at_least(40.0).at_most(70.0), 6)
         .sense(egui::Sense::click()) // Add sensing capabilities for each row in the table
@@ -220,10 +219,14 @@ fn table_ui( ui: &mut Ui, books: Vec<GoodreadsBook>) {
                     // For now, simply print selected book based on which column is clicked
                     if row.response().clicked() {
                         info!("Book has been clicked, sending request to SQL database...");
+                        let db_connection_clone = Arc::clone(&db_connection);
                         println!("{}", book);
-                        db::assert_send_book();
-                        //tokio::task::spawn(async move {db_connection.lock().unwrap().insert_owned_book(book).await});
-                        info!("Request sent");
+                        rt.spawn(async move {
+                            match db_connection_clone.lock().await.insert_owned_book(book).await {
+                                Ok(_) => info!("Query sent successfully"),
+                                Err(e) => error!("Could not send query: {e}")
+                            }
+                        });
 
                     }
                 });
