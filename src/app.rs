@@ -210,13 +210,6 @@ impl TemplateApp {
                         // For now, simply print selected book based on which column is clicked
                         if row.response().clicked() {
                             self.selected_book = Some(book);
-                            //info!("Opening date picker widget");
-                            //let mut selected_date = chrono::Utc::now().date_naive();
-
-                            //ui.add(DatePickerButton::new(&mut selected_date));
-                                                    
-                            
-
                         }
                     });
                 }
@@ -224,6 +217,11 @@ impl TemplateApp {
         if let Some(book) = self.selected_book.clone() {
             info!("Book has been clicked, sending request to SQL database...");
             info!("{}", book);
+            info!("Opening date picker widget");
+            let mut selected_date = chrono::Utc::now().date_naive();
+            ui.add(DatePickerButton::new(&mut selected_date));
+            
+            
             let db_connection_clone = Arc::clone(&self.database_connection);
             self.rt.spawn(async move {
                 match db_connection_clone.lock().await.insert_owned_book(book).await {
@@ -231,9 +229,9 @@ impl TemplateApp {
                     Err(e) => error!("Could not send query: {e}")
                 }
             });
-            self.selected_book = None; // Reset to trigger only once per selection
         }
+            
+            self.selected_book = None; // Reset to trigger only once per selection
     }
-
 }
 
