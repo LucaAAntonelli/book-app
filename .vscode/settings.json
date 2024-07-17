@@ -1,7 +1,7 @@
 {
     "rust-analyzer.linkedProjects": [
-        "./Cargo.toml",
-        "./goodreads-api/Cargo.toml",
+        "Cargo.toml",
+        "goodreads-api/Cargo.toml",
     ],
     "nixEnvSelector.nixFile": "${workspaceFolder}/shell.nix"
 }
