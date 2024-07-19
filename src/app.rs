@@ -199,12 +199,15 @@ impl TemplateApp {
                             ui.label(book.pages().to_string());
                         });
                         row.col(|ui| {
-                            ui.label(book.series().unwrap_or_else(|| "None".to_string()));
+                            ui.label(match book.series_info() {
+                                Some(series_info) => series_info.iter().map(|x| format!("{}", x.name())).collect::<Vec<_>>().join("\n\n"),
+                                None => "".to_owned(),
+                            });
                         });
                         row.col(|ui| {
-                            ui.label(match book.index() {
-                                None => "None".to_string(),
-                                Some(f) => f.to_string(),
+                            ui.label(match book.series_info() {
+                                Some(series_info) => series_info.iter().map(|x| format!("# {}", x.volume())).collect::<Vec<_>>().join("\n\n"),
+                                None => "".to_owned(),
                             });
                         });
                         // For now, simply print selected book based on which column is clicked
