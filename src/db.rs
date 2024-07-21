@@ -14,16 +14,6 @@ pub struct Book {
     end_date: Option<NaiveDate>,
 }
 
-impl Book {
-    pub fn new(book: &goodreads_api::GoodreadsBook, date: NaiveDate) -> Self {
-        
-        let title = book.title();
-        let authors = book.authors();
-        let pages = book.pages();
-
-        Self {title: title.to_string(), authors: authors.to_vec(), pages, acquisition_date: Some(date), start_date: Option::None, end_date: Option::None, price_ebook: Option::None, price_paperback: Option::None}
-    }
-}
 
 
 
@@ -36,8 +26,6 @@ impl From<goodreads_api::GoodreadsBook> for Book {
             acquisition_date: None,
             start_date: None,
             end_date: None,
-            price_ebook: None,
-            price_paperback: None
         }
     }
 }
