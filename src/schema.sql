@@ -4,7 +4,7 @@ CREATE TABLE owned_books (
     book_id SERIAL PRIMARY KEY,
     title VARCHAR(63) UNIQUE NOT NULL,
     num_pages INTEGER NOT NULL,
-    acquisition_date DATE,
+    acquisition_date DATE NOT NULL,
     url VARCHAR(255) UNIQUE NOT NULL,
     cover_url VARCHAR(255) UNIQUE NOT NULL
 );
