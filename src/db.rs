@@ -12,8 +12,6 @@ pub struct Book {
     acquisition_date: Option<NaiveDate>,
     start_date: Option<NaiveDate>,
     end_date: Option<NaiveDate>,
-    price_ebook: Option<BigDecimal>,
-    price_paperback: Option<BigDecimal>
 }
 
 impl Book {
