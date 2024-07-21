@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS owned_books, read_books, authors, book_authors, series_info;
+DROP TABLE IF EXISTS owned_books, read_books, authors, book_authors, series_info, did_not_finish_books;
 
 CREATE TABLE owned_books (
     book_id SERIAL PRIMARY KEY,
@@ -31,4 +31,8 @@ CREATE TABLE series_info (
     book_id INTEGER REFERENCES owned_books(book_id) ON DELETE CASCADE,
     series_name VARCHAR(30) NOT NULL,
     volume NUMERIC(3,1) NOT NULL
+);
+
+CREATE TABLE did_not_finish_books (
+    book_id INTEGER REFERENCES owned_books(book_id) ON DELETE CASCADE
 );
