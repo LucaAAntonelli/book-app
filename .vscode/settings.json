@@ -3,5 +3,5 @@
         "Cargo.toml",
         "goodreads-api/Cargo.toml",
     ],
-    "nixEnvSelector.nixFile": "${workspaceFolder}/shell.nix"
+    "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix"
 }
