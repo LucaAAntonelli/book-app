@@ -54,7 +54,8 @@
             rustc
             rustfmt
             tokei
-
+            openssl
+            pkg-config
             xorg.libxcb
           ];
           RUST_SRC_PATH = rustPlatform.rustLibSrc;
