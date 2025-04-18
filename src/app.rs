@@ -108,7 +108,7 @@ impl eframe::App for TemplateApp {
 
                 // Table displaying query results
                 ui.vertical(|ui| {
-                    let result_clone = Arc::clone(&self.books);
+                    let result_clone: Arc<std::sync::Mutex<Vec<_>>> = Arc::clone(&self.books);
                     let handle = self.rt.handle().clone();
                     let label = self.label.clone();
                     if self.search_button_clicked {
