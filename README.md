@@ -5,9 +5,13 @@ A personal application that combines my love for books with my passion for Rust 
 - [x] Integrate Goodreads web scraper to query for books online and gain metadata like number of pages, author(s), book series, ...
 - [x] Create SQL database to keep track of reading progress
 - [ ] Create GUI application to
-  - [ ] Add new books
-  - [ ] Update progress
+  - [ ] Keep track of owned books
+  - [ ] Add new books by searching on Goodreads
+  - [ ] Keep track of books in progress/read books
+  - [ ] Update when a book is started/finished
   - [ ] View data about reading progress
+  - [ ] Import data from Goodreads .csv exports
+  - [ ] Import data from my Excel sheet
 
 # Screenshots
 
