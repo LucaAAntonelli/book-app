@@ -10,7 +10,12 @@
       },
       {
         "ordinal": 1,
-        "name": "name",
+        "name": "first_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "last_name",
         "type_info": "Varchar"
       }
     ],
@@ -18,6 +23,7 @@
       "Left": []
     },
     "nullable": [
+      false,
       false,
       false
     ]

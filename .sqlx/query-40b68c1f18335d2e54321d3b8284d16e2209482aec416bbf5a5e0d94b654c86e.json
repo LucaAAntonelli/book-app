@@ -1,0 +1,50 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM owned_books",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "book_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "num_pages",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "acquisition_date",
+        "type_info": "Date"
+      },
+      {
+        "ordinal": 4,
+        "name": "url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "cover_url",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "40b68c1f18335d2e54321d3b8284d16e2209482aec416bbf5a5e0d94b654c86e"
+}
