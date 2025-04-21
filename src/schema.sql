@@ -18,7 +18,7 @@ CREATE TABLE read_books (
 
 CREATE TABLE authors (
     author_id SERIAL PRIMARY KEY,
-    first_name VARCHAR(24) NOT NULL,
+    given_names VARCHAR(24) NOT NULL,
     last_name VARCHAR(24) NOT NULL
 );
 

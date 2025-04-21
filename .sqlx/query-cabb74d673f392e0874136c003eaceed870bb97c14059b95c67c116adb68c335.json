@@ -10,7 +10,7 @@
       },
       {
         "ordinal": 1,
-        "name": "first_name",
+        "name": "given_names",
         "type_info": "Varchar"
       },
       {

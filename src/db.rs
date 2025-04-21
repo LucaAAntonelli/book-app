@@ -4,13 +4,22 @@ use sqlx::postgres::PgPoolOptions;
 use sqlx::Pool;
 use goodreads_api::goodreads_api;
 use log::info;
-pub struct Book {
+
+pub struct OwnedBook {
+    book_id: u32,
     title: String,
     authors: Vec<Author>,
     num_pages: u64,
     acquisition_date: Option<NaiveDate>,
-    start_date: Option<NaiveDate>,
-    end_date: Option<NaiveDate>,
+    url: String,
+    cover_url: String
+}
+
+pub struct ReadBook {
+    book_id: u32,
+    start_date: NaiveDate,
+    end_date: Option<NaiveDate>
+
 }
 
 pub struct Author {
