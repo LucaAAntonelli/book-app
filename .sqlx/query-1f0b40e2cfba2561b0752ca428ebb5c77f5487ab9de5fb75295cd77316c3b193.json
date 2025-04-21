@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO authors (first_name, last_name) VALUES ($1, $2) ON CONFLICT (first_name, last_name) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1f0b40e2cfba2561b0752ca428ebb5c77f5487ab9de5fb75295cd77316c3b193"
+}
