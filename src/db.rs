@@ -7,7 +7,7 @@ use log::info;
 pub struct Book {
     title: String,
     authors: Vec<Author>,
-    num_pages: u64,
+    num_pages: i32,
     acquisition_date: Option<NaiveDate>,
     start_date: Option<NaiveDate>,
     end_date: Option<NaiveDate>,
@@ -132,6 +132,6 @@ impl DataBaseConnection {
     }
 
     pub async fn get_all_owned_books(&self) -> Result<Vec<Book>, sqlx::Error> {
-        sqlx::query_as!(Book, "SELECT * FROM owned_books").fetch_all(&self.0).await
+        sqlx::query_as!(Book, "SELECT title, num_pages, acquisition_date FROM owned_books").fetch_all(&self.0).await
     }
 }
