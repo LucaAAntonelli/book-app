@@ -50,7 +50,7 @@ impl DataBaseConnection {
 
     pub async fn insert_owned_book(&self, input_book: GoodreadsBook) -> Result<(), sqlx::Error> {
         info!("Inserting new book into database");
-        let book = OwnedBook::from(input_book);
+        let book = OwnedBook::from(input_book.clone());
         sqlx::query!(
             "INSERT INTO owned_books (title, num_pages, acquisition_date) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
             book.title,
@@ -59,7 +59,7 @@ impl DataBaseConnection {
         ).execute(&self.0).await?;
         info!("Successfully inserted book");
     
-        for author in &book.authors {
+        for author in &input_book.authors() {
             sqlx::query!(
                 "INSERT INTO authors (given_names, last_name) VALUES ($1, $2) ON CONFLICT (given_names, last_name) DO NOTHING",
                 author.given_names,
