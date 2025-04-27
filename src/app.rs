@@ -193,7 +193,7 @@ impl TemplateApp {
                             ui.label(book.title());
                         });
                         row.col(|ui| {
-                            ui.label(book.authors().join(", ")); // For multiple authors, join them to single string
+                            ui.label(book.authors().iter().map(|author| format!("{} {}", author.given_names, author.last_name)).collect::<Vec<String>>().join(", ")); // For multiple authors, join them to single string
                         });
                         row.col(|ui| {
                             ui.label(book.pages().to_string());

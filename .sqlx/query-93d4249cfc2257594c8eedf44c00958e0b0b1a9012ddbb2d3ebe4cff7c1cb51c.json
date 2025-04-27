@@ -1,20 +1,15 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM authors",
+  "query": "SELECT given_names, last_name FROM authors",
   "describe": {
     "columns": [
       {
         "ordinal": 0,
-        "name": "author_id",
-        "type_info": "Int4"
-      },
-      {
-        "ordinal": 1,
         "name": "given_names",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 2,
+        "ordinal": 1,
         "name": "last_name",
         "type_info": "Varchar"
       }
@@ -24,9 +19,8 @@
     },
     "nullable": [
       false,
-      false,
       false
     ]
   },
-  "hash": "cabb74d673f392e0874136c003eaceed870bb97c14059b95c67c116adb68c335"
+  "hash": "93d4249cfc2257594c8eedf44c00958e0b0b1a9012ddbb2d3ebe4cff7c1cb51c"
 }
