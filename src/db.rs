@@ -7,7 +7,6 @@ use log::info;
 
 pub struct OwnedBook {
     title: String,
-    authors: Vec<Author>,
     num_pages: i32,
     acquisition_date: Option<NaiveDate>,
     url: String,
@@ -28,7 +27,6 @@ impl From<goodreads_api::GoodreadsBook> for OwnedBook {
     fn from(value: goodreads_api::GoodreadsBook) -> Self {
         Self {
             title: value.title(),
-            authors: value.authors,
             num_pages: value.pages() as i32,
             acquisition_date: None,
             url: value.url(),

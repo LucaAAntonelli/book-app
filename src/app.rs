@@ -94,12 +94,12 @@ impl eframe::App for TemplateApp {
                         }
                         if ui.button("Import from Excel").clicked() {
                             info!("Opening file dialog");
-                            self.file_dialog.select_file();
+                            self.file_dialog.pick_file();
 
                         }
                     });
                     
-                    if let Some(path) = self.file_dialog.update(ctx).selected() {
+                    if let Some(path) = self.file_dialog.update(ctx).picked() {
                         info!("File dialog selected a file");
                         println!("{}", path.to_str().unwrap());
                     }
